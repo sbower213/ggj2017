@@ -34,6 +34,7 @@ float scale = 1000;
 float period = 500.0;  // How many pixels before the wave repeats
 float dx;  // Value for incrementing X, a function of period and xspacing
 float[] yvalues;  // Using an array to store height values for the wave
+int[] notesAtTime;
 int yValHead = 0;
 
 int health = 1000;
@@ -60,6 +61,7 @@ void setup() {
   w = 640+16;
   dx = (TWO_PI / period) * xspacing;
   yvalues = new float[w/xspacing];
+  notesAtTime = new int[w/xspacing];
 }
 
 void draw() {
@@ -69,6 +71,13 @@ void draw() {
   
   float x = millis();
   float[] oppY = new float[stepsPerFrame];
+     
+  int currNotes = ((currIntercepting[0] ? 1 : 0)+
+   (currIntercepting[1] ? 2 : 0)+
+    (currIntercepting[2] ? 4 : 0)+
+     (currIntercepting[3] ? 8 : 0)+
+      (currIntercepting[4] ? 16 : 0)+
+       (currIntercepting[5] ? 32 : 0));
   for(int j = 0; j < stepsPerFrame; j++) {
     oppY[j] = amplitude *((currIntercepting[0] ? sin(1/scale*(x - oppTimesPressed[0])) : 0)+
      (currIntercepting[1] ? sin(2/scale*(x - oppTimesPressed[1])) : 0)+
@@ -81,8 +90,12 @@ void draw() {
   
   int i = yvalues.length - yValHead - 1 - (int)(yvalues.length * .25);
   if (i < 0) i += yvalues.length;
-  health -= max(abs(oppY[0] - yvalues[i]) / 20 - 2, 0);
   
+  println("currNotes: " + currNotes);
+  if (currNotes != notesAtTime[i])
+    health -= max(abs(oppY[0] - yvalues[i]) / 20 - 2, 0);
+  
+  colorMode(RGB);
   stroke(255, 0, 0);
   
   line(656 * .75, height/2+oppY[0], 656 * .75, height/2+yvalues[i]);
@@ -96,7 +109,10 @@ void draw() {
     int index = i + j;
     if (index >= yvalues.length)
       index -= yvalues.length;
-    yvalues[index] -= oppY[j];
+    if (currNotes != notesAtTime[i])
+      yvalues[index] -= oppY[j];
+    else
+      yvalues[index] = 0;
   }
   
   fill(255,0,0);
@@ -121,6 +137,13 @@ void calcWave() {
         (currPlaying[4] ? sin(16/scale*(x - timesPressed[4])) : 0)+
          (currPlaying[5] ? sin(32/scale*(x - timesPressed[5])) : 0));
     x -= 1.0 / frameRate;
+    
+    notesAtTime[index] = ((currPlaying[0] ? 1 : 0)+
+     (currPlaying[1] ? 2 : 0)+
+      (currPlaying[2] ? 4 : 0)+
+       (currPlaying[3] ? 8 : 0)+
+        (currPlaying[4] ? 16 : 0)+
+         (currPlaying[5] ? 32 : 0));
   }
   yValHead += stepsPerFrame;
   yValHead = yValHead % yvalues.length;
@@ -132,13 +155,30 @@ void renderWave() {
   stroke(255);
   // A simple way to draw the wave with an ellipse at each location
   float prev = -13134;
+  colorMode(HSB);
   for (int x = 0; x < yvalues.length; x++) {
     int adj_index = (x - yValHead)%yvalues.length;
     if(adj_index < 0) {
       adj_index += yvalues.length;
     }
-    if (prev != -13134)
+    if (prev != -13134) {
+      int notes = 0;
+      for (int i = 0; i < 6; i++) {
+        notes += (1 & (notesAtTime[adj_index] >> i));
+      }
+      
+      int hue = 0;
+      for (int i = 0; i < 6; i++) {
+        hue += (1 & (notesAtTime[adj_index] >> i)) * 42 * i;
+      }
+      if (notes > 0) hue /= notes;
+      
+      int sat = notes == 0 ? 0 : 255;
+                
+      stroke(hue, sat, 255);
+      
       line((x - 1)*xspacing, prev, x*xspacing, height/2+yvalues[adj_index]);
+    }
     prev = height/2+yvalues[adj_index];
   }
 }
