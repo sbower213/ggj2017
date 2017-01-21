@@ -117,6 +117,14 @@ void draw() {
   
   fill(255,0,0);
   rect(0,0,health / 1000.0 * width,20);
+  
+  colorMode(HSB);
+  for (int j = 0; j < 6; j++) {
+    fill(42 * j, 255, 255);
+    noStroke();
+    
+    ellipse(width / 6.0 * j + width / 12.0, height - 30, 60, 60);
+  }
 }
 
 
@@ -136,7 +144,7 @@ void calcWave() {
        (currPlaying[3] ? sin(8/scale*(x - timesPressed[3])) : 0)+
         (currPlaying[4] ? sin(16/scale*(x - timesPressed[4])) : 0)+
          (currPlaying[5] ? sin(32/scale*(x - timesPressed[5])) : 0));
-    x -= 1.0 / frameRate;
+    x -= 1.0 / frameRate * stepsPerFrame;
     
     notesAtTime[index] = ((currPlaying[0] ? 1 : 0)+
      (currPlaying[1] ? 2 : 0)+
