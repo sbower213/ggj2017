@@ -26,6 +26,8 @@ int constant = 0;
 int[] timesPressed = new int[6];
 int[] oppTimesPressed = new int[6];
 
+int stepsPerFrame = 2;
+
 float theta = 0.0;  // Start angle at 0
 float amplitude = 75.0;  // Height of wave
 float scale = 1000;
@@ -66,24 +68,36 @@ void draw() {
   renderWave();
   
   float x = millis();
-  float oppY = amplitude *((currIntercepting[0] ? sin(1/scale*(x - oppTimesPressed[0])) : 0)+
-   (currIntercepting[1] ? sin(2/scale*(x - oppTimesPressed[1])) : 0)+
-    (currIntercepting[2] ? sin(4/scale*(x - oppTimesPressed[2])) : 0)+
-     (currIntercepting[3] ? sin(8/scale*(x - oppTimesPressed[3])) : 0)+
-      (currIntercepting[4] ? sin(16/scale*(x - oppTimesPressed[4])) : 0)+
-       (currIntercepting[5] ? sin(32/scale*(x - oppTimesPressed[5])) : 0));
+  float[] oppY = new float[stepsPerFrame];
+  for(int j = 0; j < stepsPerFrame; j++) {
+    oppY[j] = amplitude *((currIntercepting[0] ? sin(1/scale*(x - oppTimesPressed[0])) : 0)+
+     (currIntercepting[1] ? sin(2/scale*(x - oppTimesPressed[1])) : 0)+
+      (currIntercepting[2] ? sin(4/scale*(x - oppTimesPressed[2])) : 0)+
+       (currIntercepting[3] ? sin(8/scale*(x - oppTimesPressed[3])) : 0)+
+        (currIntercepting[4] ? sin(16/scale*(x - oppTimesPressed[4])) : 0)+
+         (currIntercepting[5] ? sin(32/scale*(x - oppTimesPressed[5])) : 0));
+     x -= 1.0 / frameRate;
+  }
   
-  int i = yvalues.length - yValHead - 2;
+  int i = yvalues.length - yValHead - 1 - (int)(yvalues.length * .25);
   if (i < 0) i += yvalues.length;
-  health -= abs(oppY - yvalues[i]) / 20;
+  health -= max(abs(oppY[0] - yvalues[i]) / 20 - 2, 0);
   
   stroke(255, 0, 0);
   
-  line(656, height/2+oppY, 656, height/2+yvalues[i]);
+  line(656 * .75, height/2+oppY[0], 656 * .75, height/2+yvalues[i]);
   
   stroke(255);
   
-  ellipse(656, height/2+oppY, 16, 16);
+  ellipse(656 * .75, height/2+oppY[0], 16, 16);
+  
+  
+  for(int j = 0; j < stepsPerFrame; j++) {
+    int index = i + j;
+    if (index >= yvalues.length)
+      index -= yvalues.length;
+    yvalues[index] -= oppY[j];
+  }
   
   fill(255,0,0);
   rect(0,0,health / 1000.0 * width,20);
@@ -96,13 +110,19 @@ void calcWave() {
 
   // For every x value, calculate a y value with sine function
   float x = millis();
-  yvalues[yvalues.length - yValHead - 1] = amplitude *((currPlaying[0] ? sin(1/scale*(x - timesPressed[0])) : 0)+
-   (currPlaying[1] ? sin(2/scale*(x - timesPressed[1])) : 0)+
-    (currPlaying[2] ? sin(4/scale*(x - timesPressed[2])) : 0)+
-     (currPlaying[3] ? sin(8/scale*(x - timesPressed[3])) : 0)+
-      (currPlaying[4] ? sin(16/scale*(x - timesPressed[4])) : 0)+
-       (currPlaying[5] ? sin(32/scale*(x - timesPressed[5])) : 0));
-  yValHead += 1;
+  for (int i = 0; i < stepsPerFrame; i++) {
+    int index = yvalues.length - yValHead - 1 + i;
+    if (index >= yvalues.length)
+      index -= yvalues.length;
+    yvalues[index] = amplitude *((currPlaying[0] ? sin(1/scale*(x - timesPressed[0])) : 0)+
+     (currPlaying[1] ? sin(2/scale*(x - timesPressed[1])) : 0)+
+      (currPlaying[2] ? sin(4/scale*(x - timesPressed[2])) : 0)+
+       (currPlaying[3] ? sin(8/scale*(x - timesPressed[3])) : 0)+
+        (currPlaying[4] ? sin(16/scale*(x - timesPressed[4])) : 0)+
+         (currPlaying[5] ? sin(32/scale*(x - timesPressed[5])) : 0));
+    x -= 1.0 / frameRate;
+  }
+  yValHead += stepsPerFrame;
   yValHead = yValHead % yvalues.length;
 }
 
