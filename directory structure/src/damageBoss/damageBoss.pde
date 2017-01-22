@@ -27,10 +27,12 @@ float delta;
 Wave playerWave;
 Boss boss;
 Wave bossWave1, bossWave2;
+FilePlayer filePlayer1, filePlayer2;
 
 int turn = 0;
 int barsPerTurn = 4;
 boolean switchedPlayers = false;
+boolean nextPhase = false;
 
 int flashFrames = 0;
 
@@ -38,8 +40,11 @@ SoundFile[] clicks;
 int clickCtr;
 int nextClick;
 
-String[] riffs = {"riff_1a.txt"};//, "riff_1b.txt", "riff_2a.txt", "riff_2b.txt", "riff_3a.txt", "riff_3b.txt"};
+String[] riff1s = {"riff_1a.txt", "riff_2a.txt", "riff_3a.txt"};
+String[] riff2s = {"riff_1b.txt", "riff_2b.txt", "riff_3b.txt"};
 int curRiff;
+
+boolean started;
 
 void setup() {
   size(800, 360);
@@ -58,6 +63,9 @@ void setup() {
   playerWave = new Wave(75.0, 300, 2, width, 2 * barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
   bossWave1 = new Wave(75.0, 300, 2, width / 2, 2 * barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
   bossWave2 = new Wave(75.0, 300, 2, width / 2, 2 * barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
+  
+  filePlayer1 = new FilePlayer();
+  filePlayer2 = new FilePlayer();
   
   boss = new Boss();
   
@@ -133,97 +141,156 @@ void setup() {
 
 void draw() {
   background(0);
-  delta = (millis() - lastMillis) / 1000.0;
-  lastMillis = millis();
-  
-  if(millis() > clickCtr){
-    clicks[nextClick].play();
-    clickCtr += millisPerBeat;
-    nextClick++;
-    nextClick %= 4;
-  }
-  
-  if (turn % 2 == 0) {
-    if (turn == 2) {
-      scale(-1, 1);
-      translate(-width, 0);
-    }
-    playerWave.drawWave();
+  if (!started) {
+    textSize(16);
+    textAlign(CENTER);
+    fill(255,255,255,0);
+    stroke(255,255,255,255);
+    // Fix for centering later?
+    rect(300,130,200,90);
+    fill(255,255,255,255);
+    text("WAVE BATTLE", 400, 60);
+    text("START GAME", 400, 180);
+  } else {
+    delta = (millis() - lastMillis) / 1000.0;
+    lastMillis = millis();
     
-    playerWave.drawOpponent();
-    if (turn == 2) {
+    if(millis() > clickCtr){
+      clicks[nextClick].play();
+      clickCtr += millisPerBeat;
+      nextClick++;
+      nextClick %= 4;
+    }
+    
+    if (turn % 2 == 0) {
+      if (turn == 2) {
+        scale(-1, 1);
+        translate(-width, 0);
+      }
+      playerWave.drawWave();
+      
+      playerWave.drawOpponent();
+      if (turn == 2) {
+        translate(width, 0);
+        scale(-1, 1);
+      }
+      
+      drawUI();
+      
+      boss.drawBoss();
+      
+      countBossDamage();
+      
+      if (!switchedPlayers && millis() - turnStart > millisPerBeat * barsPerTurn * 2) {
+        for (int i = 0; i < squares.length; i++)
+          squares[i].stop();
+        for (int i = 0; i < sines.length; i++)
+          sines[i].stop();
+        playerWave.stopAll();
+        
+        switchedPlayers = true;
+        flashFrames = 4;
+        
+        filePlayer1.setSong(riff1s[curRiff], squares, sines);
+        filePlayer2.setSong(riff2s[curRiff], squares, sines);
+        curRiff++;
+        curRiff %= riff1s.length;
+        println("riff: " + curRiff);
+      }
+      
+      if (flashFrames > 0) {
+        fill(255, 255 * flashFrames / 4.0);
+        rect(0,0,width,height);
+        flashFrames--;
+      }
+      
+      if(millis() - turnStart > millisPerBeat * barsPerTurn * 4) {
+        for (int i = 0; i < squares.length; i++)
+          squares[i].stop();
+        for (int i = 0; i < sines.length; i++)
+          sines[i].stop();
+        playerWave.stopAll();
+        
+        damageBoss();
+        turn ++;
+        turn %= 4;
+        println("turn: " + turn);
+        turnStart = millis();
+        switchedPlayers = false;
+        filePlayer1.reset();
+        filePlayer2.reset();
+        //if (turn == 1) {
+          bossWave1.travelTime = 4 * barsPerTurn * millisPerBeat;
+          bossWave2.travelTime = 2 * barsPerTurn * millisPerBeat;
+        /*} else {
+          bossWave2.travelTime = 2 * barsPerTurn * millisPerBeat;
+          bossWave1.travelTime = 4 * barsPerTurn * millisPerBeat;
+        }*/
+        barsPerTurn = 6;
+      }
+    } else {
+      bossWave1.drawWave();
+      bossWave1.drawOpponent();
+      
       translate(width, 0);
       scale(-1, 1);
-    }
-    
-    drawUI();
-    
-    boss.drawBoss();
-    
-    countBossDamage();
-    
-    if (!switchedPlayers && millis() - turnStart > millisPerBeat * barsPerTurn * 2) {
-      for (int i = 0; i < squares.length; i++)
-        squares[i].stop();
-      for (int i = 0; i < sines.length; i++)
-        sines[i].stop();
-      playerWave.stopAll();
+      bossWave2.drawWave();
+      bossWave2.drawOpponent();
+      scale(-1, 1);
+      translate(-width, 0);
       
-      switchedPlayers = true;
-      flashFrames = 4;
+      drawUI();
       
-      boss.setSong(riffs[curRiff], squares, sines);
-      curRiff++;
-      curRiff %= riffs.length;
-    }
-    
-    if (flashFrames > 0) {
-      fill(255, 255 * flashFrames / 4.0);
-      rect(0,0,width,height);
-      flashFrames--;
-    }
-    
-    if(millis() - turnStart > millisPerBeat * barsPerTurn * 4) {
-      for (int i = 0; i < squares.length; i++)
-        squares[i].stop();
-      for (int i = 0; i < sines.length; i++)
-        sines[i].stop();
-      playerWave.stopAll();
+      boss.drawBoss();
       
-      damageBoss();
-      turn ++;
-      turn %= 4;
-      println("turn: " + turn);
-      turnStart = millis();
-      switchedPlayers = false;
-      boss.reset();
-    }
-  } else {
-    bossWave1.drawWave();
-    bossWave1.drawOpponent();
-    
-    translate(width, 0);
-    scale(-1, 1);
-    bossWave2.drawWave();
-    bossWave2.drawOpponent();
-    scale(-1, 1);
-    translate(-width, 0);
-    
-    drawUI();
-    
-    boss.drawBoss();
-    
-    boss.playSong(bossWave1, bossWave2);
-    
-    damagePlayer();
-    
-    if(millis() - turnStart > millisPerBeat * barsPerTurn * 4) {
-      bossWave1.reset();
-      bossWave2.reset();
-      turn ++;
-      turn %= 4;
-      println("turn: " + turn);
-      turnStart = millis();
+      filePlayer1.playSong(bossWave1);
+      if (switchedPlayers)
+        filePlayer2.playSong(bossWave2);
+      
+      damagePlayer();
+      
+      if (!switchedPlayers && millis() - turnStart > millisPerBeat * 8) {
+        for (int i = 0; i < squares.length; i++)
+          squares[i].stop();
+        for (int i = 0; i < sines.length; i++)
+          sines[i].stop();
+        bossWave1.stopAll();
+        bossWave2.stopAll();
+        
+        switchedPlayers = true;
+        
+        filePlayer2.reset();
+      }
+      
+      if (!nextPhase && millis() - turnStart > millisPerBeat * 16) {
+        for (int i = 0; i < squares.length; i++)
+          squares[i].stop();
+        for (int i = 0; i < sines.length; i++)
+          sines[i].stop();
+        bossWave1.stopAll();
+        bossWave2.stopAll();
+        
+        nextPhase = true;
+        flashFrames = 4;
+      }
+      
+      if (flashFrames > 0) {
+        fill(255, 255 * flashFrames / 4.0);
+        rect(0,0,width,height);
+        flashFrames--;
+      }
+      
+      if(millis() - turnStart > millisPerBeat * barsPerTurn * 4) {
+        bossWave1.reset();
+        bossWave2.reset();
+        turn ++;
+        turn %= 4;
+        println("turn: " + turn);
+        turnStart = millis();
+        barsPerTurn = 4;
+        switchedPlayers = false;
+        nextPhase = false;
+      }
     }
   }
 }
@@ -274,10 +341,17 @@ void damageBoss() {
 void countBossDamage() {
   float t = millis();
   float oppHeight = playerWave.p2Height(t);
-  float p1Height = playerWave.p1Height(t - playerWave.travelTime);
   
   if (playerWave.matched(t - playerWave.travelTime)) {
     damageCounter += abs(oppHeight) * delta;
+  }
+}
+
+void mousePressed() {
+  
+  if(mouseX <= 500 && mouseX >= 300 && mouseY <= 210 && mouseY <= 210 && mouseY >= 120) {
+    // Enter start game conditions here.
+    started = true;
   }
 }
 
