@@ -45,10 +45,13 @@ String[] riff2s = {"riff_1b.txt", "riff_2b.txt", "riff_3b.txt"};
 int curRiff;
 
 boolean started;
+PImage logo;
 
 void setup() {
   size(800, 360);
   background(255);
+  
+  logo = loadImage("logo.png");
   
   squares = new SqrOsc[6];
   for (int i = 0; i < squares.length; i++) {
@@ -141,20 +144,22 @@ void setup() {
 
 void draw() {
   background(0);
+  delta = (millis() - lastMillis) / 1000.0;
+  lastMillis = millis();
+    
+    
   if (!started) {
     textSize(16);
     textAlign(CENTER);
     fill(255,255,255,0);
     stroke(255,255,255,255);
     // Fix for centering later?
+    image(logo, 0, 0, width, height);
     rect(300,130,200,90);
     fill(255,255,255,255);
-    text("WAVE BATTLE", 400, 60);
+//    text("WAVE BATTLE", 400, 60);
     text("START GAME", 400, 180);
   } else {
-    delta = (millis() - lastMillis) / 1000.0;
-    lastMillis = millis();
-    
     if(millis() > clickCtr){
       clicks[nextClick].play();
       clickCtr += millisPerBeat;
@@ -281,6 +286,10 @@ void draw() {
       }
       
       if(millis() - turnStart > millisPerBeat * barsPerTurn * 4) {
+        for (int i = 0; i < squares.length; i++)
+          squares[i].stop();
+        for (int i = 0; i < sines.length; i++)
+          sines[i].stop();
         bossWave1.reset();
         bossWave2.reset();
         turn ++;
@@ -352,6 +361,8 @@ void mousePressed() {
   if(mouseX <= 500 && mouseX >= 300 && mouseY <= 210 && mouseY <= 210 && mouseY >= 120) {
     // Enter start game conditions here.
     started = true;
+    turnStart = millis();
+    clickCtr = millis();
   }
 }
 
