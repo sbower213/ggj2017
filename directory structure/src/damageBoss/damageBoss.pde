@@ -17,15 +17,25 @@ boolean[] p1CurrPlaying = {false, false, false, false, false, false};
 boolean[] p2CurrPlaying = {false, false, false, false, false, false};
 
 int health = 1000;
-int bossInterval = 0;
+int turnStart = 0;
 float damageCounter = 0;
 int intervalNotesPlayed = 0;
-int millisPerBeat = 200;
+int millisPerBeat = 400;
 int lastMillis;
 float delta;
 
-Wave wave;
+Wave playerWave;
 Boss boss;
+Wave bossWave1, bossWave2;
+
+int turn = 0;
+int barsPerTurn = 4;
+boolean switchedPlayers = false;
+
+int flashFrames = 0;
+
+SoundFile click;
+int clickCtr;
 
 void setup() {
   size(800, 360);
@@ -41,8 +51,14 @@ void setup() {
     sines[i] = new SinOsc(this);
   }
   
-  wave = new Wave(75.0, 300, 2, 656, 2000);
+  playerWave = new Wave(75.0, 300, 2, 656, 2 * barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
+  bossWave1 = new Wave(75.0, 300, 2, 250, 2 * barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
+  bossWave2 = new Wave(75.0, 300, 2, 250, 2 * barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
+  
   boss = new Boss();
+  
+  click = new SoundFile(this, "click.mp3");
+  clickCtr = 0;
   
   map = new HashMap<String,Float>();
   
@@ -115,19 +131,90 @@ void draw() {
   delta = (millis() - lastMillis) / 1000.0;
   lastMillis = millis();
   
-  wave.drawWave();
+  if(millis() > clickCtr){
+    click.play();
+    clickCtr += millisPerBeat;
+  }
   
-  wave.drawOpponent();
-  
-  drawUI();
-  
-  countBossDamage();
-  
-  boss.drawBoss();
+  if (turn % 2 == 0) {
+    if (turn == 2) {
+      scale(-1, 1);
+      translate(-width, 0);
+    }
+    playerWave.drawWave();
+    
+    playerWave.drawOpponent();
+    if (turn == 2) {
+      translate(width, 0);
+      scale(-1, 1);
+    }
+    
+    drawUI();
+    
+    boss.drawBoss();
+    
+    countBossDamage();
+    
+    if (!switchedPlayers && millis() - turnStart > millisPerBeat * barsPerTurn * 2) {
+      for (int i = 0; i < squares.length; i++)
+        squares[i].stop();
+      for (int i = 0; i < sines.length; i++)
+        sines[i].stop();
+      playerWave.stopAll();
+      
+      switchedPlayers = true;
+      flashFrames = 4;
+    }
+    
+    if (flashFrames > 0) {
+      fill(255, 255 * flashFrames / 4.0);
+      rect(0,0,width,height);
+      flashFrames--;
+      
+      boss.setSong("song2_reformatted.txt", squares, sines);
+    }
+    
+    if(millis() - turnStart > millisPerBeat * barsPerTurn * 4) {
+      for (int i = 0; i < squares.length; i++)
+        squares[i].stop();
+      for (int i = 0; i < sines.length; i++)
+        sines[i].stop();
+      playerWave.stopAll();
+      
+      damageBoss();
+      turn ++;
+      turn %= 4;
+      println("turn: " + turn);
+      turnStart = millis();
+      switchedPlayers = false;
+      playerWave.reset();
+    }
+  } else {
+    bossWave1.drawWave();
+    bossWave1.drawOpponent();
+    
+    translate(width, 0);
+    scale(-1, 1);
+    bossWave2.drawWave();
+    bossWave2.drawOpponent();
+    scale(-1, 1);
+    translate(-width, 0);
+    
+    boss.playSong(bossWave1, bossWave2);
+    
+    if(millis() - turnStart > millisPerBeat * barsPerTurn * 4) {
+      bossWave1.reset();
+      bossWave2.reset();
+      turn ++;
+      turn %= 4;
+      println("turn: " + turn);
+      turnStart = millis();
+      boss.reset();
+    }
+  }
 }
 
 void drawUI() {
-  
   fill(255,0,0);
   rect(0, 0, health / 1000.0 * width,20);
   
@@ -140,80 +227,154 @@ void drawUI() {
   }
 }
 
+void damageBoss() {
+  /*println("counter: " + damageCounter);
+  println("modifier: " + (intervalNotesPlayed + 1));*/
+  float damageToBoss = damageCounter * (intervalNotesPlayed + 1);
+  boss.damage(damageToBoss);
+  intervalNotesPlayed = 0;
+  damageCounter = 0;
+  /*println("Negative Damage: " + damageCounter);
+  println("Number of notes stacked: " + intervalNotesPlayed);
+  println("Damage to Boss: " + damageToBoss);
+  println("********************************************************************");*/
+}
+
 void countBossDamage() {
   float t = millis();
-  float oppHeight = wave.p2Height(t);
-  float p1Height = wave.p1Height(t - wave.travelTime);
+  float oppHeight = playerWave.p2Height(t);
+  float p1Height = playerWave.p1Height(t - playerWave.travelTime);
   
-  if (wave.matched(t - wave.travelTime)) {
+  if (playerWave.matched(t - playerWave.travelTime)) {
     damageCounter += abs(oppHeight) * delta;
-  }
-  
-  if(millis() - bossInterval > millisPerBeat * 16) {
-    bossInterval = millis();
-    println("counter: " + damageCounter);
-    println("modifier: " + (intervalNotesPlayed + 1));
-    float damageToBoss = damageCounter * (intervalNotesPlayed + 1);
-    boss.damage(damageToBoss);
-    intervalNotesPlayed = 0;
-    damageCounter = 0;
-    println("Negative Damage: " + damageCounter);
-    println("Number of notes stacked: " + intervalNotesPlayed);
-    println("Damage to Boss: " + damageToBoss);
-    println("********************************************************************");
   }
 }
 
 void keyPressed() {
-  if (p1ButtonToNumMap.containsKey("" + key)) {
-    int num = p1ButtonToNumMap.get("" + key);
-    
-    if (!p1CurrPlaying[num]) {
-      p1CurrPlaying[num] = true;
-      
-      String note = numToNoteMap.get(num);
-      squares[num].play(map.get(note), .4);
-      
-      intervalNotesPlayed += 1;
-      
-      wave.p1PlayNote(note);
-    }
-  }
   
-  if (p2ButtonToNumMap.containsKey("" + key)) {
-    int num = p2ButtonToNumMap.get("" + key);
+  if (turn % 2 == 0) {
+    if (((turn == 0 && millis() - turnStart < millisPerBeat * barsPerTurn * 2) ||
+      (turn == 2 && millis() - turnStart >= millisPerBeat * barsPerTurn * 2))
+        && p1ButtonToNumMap.containsKey("" + key)) {
+      int num = p1ButtonToNumMap.get("" + key);
+      
+      if (!p1CurrPlaying[num]) {
+        p1CurrPlaying[num] = true;
+        
+        String note = numToNoteMap.get(num);
+        squares[num].play(map.get(note), .4);
+        
+        intervalNotesPlayed += 1;
+      
+        if (turn == 0)
+          playerWave.p1PlayNote(note);
+        else
+          playerWave.p2PlayNote(note);
+      }
+    }
     
-    if (!p2CurrPlaying[num]) {
-      p2CurrPlaying[num] = true;
+    if (((turn == 2 && millis() - turnStart < millisPerBeat * barsPerTurn * 2) ||
+      (turn == 0 && millis() - turnStart >= millisPerBeat * barsPerTurn * 2))
+        && p2ButtonToNumMap.containsKey("" + key)) {
+      int num = p2ButtonToNumMap.get("" + key);
       
-      String note = numToNoteMap.get(num);
-      sines[num].play(map.get(note), .4);
+      if (!p2CurrPlaying[num]) {
+        p2CurrPlaying[num] = true;
+        
+        String note = numToNoteMap.get(num);
+        sines[num].play(map.get(note), .4);
+        
+        if (turn == 2)
+          playerWave.p1PlayNote(note);
+        else
+          playerWave.p2PlayNote(note);
+      }
+    }
+  } else {
+    if (p1ButtonToNumMap.containsKey("" + key)) {
+      int num = p1ButtonToNumMap.get("" + key);
       
-      wave.p2PlayNote(note);
+      if (!p1CurrPlaying[num]) {
+        p1CurrPlaying[num] = true;
+        
+        String note = numToNoteMap.get(num);
+        squares[num].play(map.get(note), .4);
+        
+        intervalNotesPlayed += 1;
+      
+        bossWave1.p2PlayNote(note);
+      }
+    }
+    
+    if (p2ButtonToNumMap.containsKey("" + key)) {
+      int num = p2ButtonToNumMap.get("" + key);
+      
+      if (!p2CurrPlaying[num]) {
+        p2CurrPlaying[num] = true;
+        
+        String note = numToNoteMap.get(num);
+        sines[num].play(map.get(note), .4);
+        
+        bossWave2.p2PlayNote(note);
+      }
     }
   }
 }
 
 void keyReleased() {
-  if (p1ButtonToNumMap.containsKey("" + key)) {
-    int num = p1ButtonToNumMap.get("" + key);
-    
-    p1CurrPlaying[num] = false;
-    
-    String note = numToNoteMap.get(num);
-    squares[num].stop();
+  if (turn % 2 == 0) {
+    if (((turn == 0 && millis() - turnStart < millisPerBeat * barsPerTurn * 2) ||
+      (turn == 2 && millis() - turnStart >= millisPerBeat * barsPerTurn * 2))
+        && p1ButtonToNumMap.containsKey("" + key)) {
+      int num = p1ButtonToNumMap.get("" + key);
       
-    wave.p1PlayNote(note);
-  }
-  
-  if (p2ButtonToNumMap.containsKey("" + key)) {
-    int num = p2ButtonToNumMap.get("" + key);
-    
-    p2CurrPlaying[num] = false;
-    
-    String note = numToNoteMap.get(num);
-    sines[num].stop();
+      p1CurrPlaying[num] = false;
       
-    wave.p2PlayNote(note);
+      String note = numToNoteMap.get(num);
+      squares[num].stop();
+      
+      if (turn == 0)
+        playerWave.p1PlayNote(note);
+      else
+        playerWave.p2PlayNote(note);
+    }
+    
+    if (((turn == 2 && millis() - turnStart < millisPerBeat * barsPerTurn * 2) ||
+      (turn == 0 && millis() - turnStart >= millisPerBeat * barsPerTurn * 2))
+        && p2ButtonToNumMap.containsKey("" + key)) {
+      int num = p2ButtonToNumMap.get("" + key);
+      
+      p2CurrPlaying[num] = false;
+      
+      String note = numToNoteMap.get(num);
+      sines[num].stop();
+        
+      if (turn == 2)
+        playerWave.p1PlayNote(note);
+      else
+        playerWave.p2PlayNote(note);
+    }
+  } else {
+    if (p1ButtonToNumMap.containsKey("" + key)) {
+      int num = p1ButtonToNumMap.get("" + key);
+      
+      p1CurrPlaying[num] = false;
+      
+      String note = numToNoteMap.get(num);
+      squares[num].stop();
+      
+      bossWave1.p2PlayNote(note);
+    }
+    
+    if (p2ButtonToNumMap.containsKey("" + key)) {
+      int num = p2ButtonToNumMap.get("" + key);
+      
+      p2CurrPlaying[num] = false;
+      
+      String note = numToNoteMap.get(num);
+      sines[num].stop();
+        
+      bossWave2.p2PlayNote(note);
+    }
   }
 }

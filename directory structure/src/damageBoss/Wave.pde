@@ -27,6 +27,14 @@ class Wave {
     travelTime = tt;
   }
   
+  void reset() {
+    p1EventTimes = new ArrayList<Integer>();
+    p2EventTimes = new ArrayList<Integer>();
+    
+    p1EventNotes = new ArrayList<String>();
+    p2EventNotes = new ArrayList<String>();
+  }
+  
   void drawWave() {
     noFill();
     stroke(255);
@@ -115,6 +123,25 @@ class Wave {
         break;
     }
     return equal;
+  }
+  
+  void stopAll() {
+    int t = millis();
+    
+    boolean[] p1NotesPlaying = new boolean[squares.length];
+    for (int i = 0; i < p1EventTimes.size(); i++) {
+      if (p1EventTimes.get(i) > t)
+        break;
+      if (noteToNumMap.containsKey(p1EventNotes.get(i))) {
+        int indx = noteToNumMap.get(p1EventNotes.get(i));
+        p1NotesPlaying[indx] = !p1NotesPlaying[indx];
+      }
+    }
+    
+    for (int i = 0; i < p1NotesPlaying.length; i++) {
+      if (p1NotesPlaying[i])
+        p1PlayNote(numToNoteMap.get(i));
+    }
   }
 
   float p1Height(float t) {
