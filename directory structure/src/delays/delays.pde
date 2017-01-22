@@ -50,7 +50,7 @@ PImage logo;
 boolean delay;
 int delayStart;
 
-boolean p1Active = true;
+boolean p1Active = false;
 boolean p2Active = false;
 
 void setup() {
@@ -198,6 +198,11 @@ void draw() {
       } else {
         delay = false;
         turnStart = millis();
+        
+        
+        //logic for controlling who is active
+        //temp for now
+        p1Active = true;
       }
     } else {
 
