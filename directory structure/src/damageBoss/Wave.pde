@@ -202,12 +202,12 @@ class Wave {
   }
   
   void p1PlayNote(String note) {
-      p1EventTimes.add((int)(((int)(millis() / millisPerBeat) + 1) * millisPerBeat));
+      p1EventTimes.add((int)(((int)(millis() / (millisPerBeat / 4)) + 1) * (millisPerBeat / 4)));
       p1EventNotes.add(note);
   }
   
   void p2PlayNote(String note) {
-      p2EventTimes.add((int)(((int)(millis() / millisPerBeat) + 1) * millisPerBeat));
+      p2EventTimes.add((int)(((int)(millis() / (millisPerBeat / 4)) + 1) * (millisPerBeat / 4)));
       p2EventNotes.add(note);
   }
 }

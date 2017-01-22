@@ -34,8 +34,12 @@ boolean switchedPlayers = false;
 
 int flashFrames = 0;
 
-SoundFile click;
+SoundFile[] clicks;
 int clickCtr;
+int nextClick;
+
+String[] riffs = {"riff_1a.txt"};//, "riff_1b.txt", "riff_2a.txt", "riff_2b.txt", "riff_3a.txt", "riff_3b.txt"};
+int curRiff;
 
 void setup() {
   size(800, 360);
@@ -51,13 +55,14 @@ void setup() {
     sines[i] = new SinOsc(this);
   }
   
-  playerWave = new Wave(75.0, 300, 2, 656, 2 * barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
-  bossWave1 = new Wave(75.0, 300, 2, 250, 2 * barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
-  bossWave2 = new Wave(75.0, 300, 2, 250, 2 * barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
+  playerWave = new Wave(75.0, 300, 2, width, 2 * barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
+  bossWave1 = new Wave(75.0, 300, 2, width / 2, 2 * barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
+  bossWave2 = new Wave(75.0, 300, 2, width / 2, 2 * barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
   
   boss = new Boss();
   
-  click = new SoundFile(this, "click.mp3");
+  clicks = new SoundFile[]{new SoundFile(this, "mid.mp3"), new SoundFile(this, "hi.mp3"), 
+            new SoundFile(this, "mid.mp3"), new SoundFile(this, "lo.mp3")};
   clickCtr = 0;
   
   map = new HashMap<String,Float>();
@@ -132,8 +137,10 @@ void draw() {
   lastMillis = millis();
   
   if(millis() > clickCtr){
-    click.play();
+    clicks[nextClick].play();
     clickCtr += millisPerBeat;
+    nextClick++;
+    nextClick %= 4;
   }
   
   if (turn % 2 == 0) {
@@ -164,14 +171,16 @@ void draw() {
       
       switchedPlayers = true;
       flashFrames = 4;
+      
+      boss.setSong(riffs[curRiff], squares, sines);
+      curRiff++;
+      curRiff %= riffs.length;
     }
     
     if (flashFrames > 0) {
       fill(255, 255 * flashFrames / 4.0);
       rect(0,0,width,height);
       flashFrames--;
-      
-      boss.setSong("song2_reformatted.txt", squares, sines);
     }
     
     if(millis() - turnStart > millisPerBeat * barsPerTurn * 4) {
@@ -187,7 +196,7 @@ void draw() {
       println("turn: " + turn);
       turnStart = millis();
       switchedPlayers = false;
-      playerWave.reset();
+      boss.reset();
     }
   } else {
     bossWave1.drawWave();
@@ -200,6 +209,10 @@ void draw() {
     scale(-1, 1);
     translate(-width, 0);
     
+    drawUI();
+    
+    boss.drawBoss();
+    
     boss.playSong(bossWave1, bossWave2);
     
     if(millis() - turnStart > millisPerBeat * barsPerTurn * 4) {
@@ -209,7 +222,6 @@ void draw() {
       turn %= 4;
       println("turn: " + turn);
       turnStart = millis();
-      boss.reset();
     }
   }
 }

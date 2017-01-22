@@ -24,11 +24,6 @@ class Boss {
     health -= d;
   }
   
-  void reset() {
-    resetTime = millis();
-    eventIndex = 0;
-  }
-  
   void setSong(String filename,SqrOsc[] setSquares, SinOsc[] setSines) {
     squares = setSquares;
     sines = setSines;
@@ -51,7 +46,14 @@ class Boss {
     }
   }
   
+  
+  void reset() {
+    resetTime = millis();
+    eventIndex = 0;
+  }
+  
   void playSong(Wave wave1, Wave wave2){
+    println("m: " + (millis() - resetTime));
     while(eventIndex < eventTimes.length && millis() - resetTime >= eventTimes[eventIndex]){
       String noteName = eventNotes[eventIndex];
       float noteFreq = map.get(noteName);
@@ -72,10 +74,12 @@ class Boss {
         }
       }else if(noteName.equals("fs")){
         if(currPlaying[1]){
+          println("stopped fs");
           squares[1].stop();
           //numPlaying--;
           currPlaying[1] = false;
         } else {
+          println("started fs");
           currPlaying[1] = true;
           //numPlaying += 1;
           squares[1].play(noteFreq, .4);
