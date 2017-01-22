@@ -16,7 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStream; 
 import java.io.IOException; 
 
-public class damageBoss extends PApplet {
+public class WaveBattle extends PApplet {
 
 //alright lets process some things
 
@@ -810,7 +810,7 @@ class FilePlayer {
     squares = setSquares;
     sines = setSines;
     
-    lines = loadStrings(filename);
+    lines = loadStrings("data/" + filename);
     
     eventTimes = new int[lines.length];
     eventNotes = new String[lines.length];
@@ -1215,7 +1215,7 @@ class Wave {
 }
   public void settings() {  fullScreen(); }
   static public void main(String[] passedArgs) {
-    String[] appletArgs = new String[] { "damageBoss" };
+    String[] appletArgs = new String[] { "WaveBattle" };
     if (passedArgs != null) {
       PApplet.main(concat(appletArgs, passedArgs));
     } else {

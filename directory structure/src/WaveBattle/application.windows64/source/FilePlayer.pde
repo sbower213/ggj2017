@@ -30,7 +30,7 @@ class FilePlayer {
     squares = setSquares;
     sines = setSines;
     
-    lines = loadStrings(filename);
+    lines = loadStrings("data/" + filename);
     
     eventTimes = new int[lines.length];
     eventNotes = new String[lines.length];

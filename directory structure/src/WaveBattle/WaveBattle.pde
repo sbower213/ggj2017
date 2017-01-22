@@ -1,27 +1,7 @@
-import processing.core.*; 
-import processing.data.*; 
-import processing.event.*; 
-import processing.opengl.*; 
-
-import processing.sound.*; 
-import java.util.Map; 
-import processing.sound.*; 
-
-import java.util.HashMap; 
-import java.util.ArrayList; 
-import java.io.File; 
-import java.io.BufferedReader; 
-import java.io.PrintWriter; 
-import java.io.InputStream; 
-import java.io.OutputStream; 
-import java.io.IOException; 
-
-public class damageBoss extends PApplet {
-
 //alright lets process some things
 
-
-
+import processing.sound.*;
+import java.util.Map;
 
 SqrOsc[] squares;
 
@@ -85,13 +65,13 @@ boolean delay2Over;
 boolean delay;
 int delayStart;
 
-public void setup() {
-  
+void setup() {
+  fullScreen();
   //size(800, 360);
   background(255);
 
   uiScale = height / 360;
-  widthScale = width / 800.0f;
+  widthScale = width / 800.0;
 
   logo = loadImage("logo.png");
 
@@ -113,18 +93,18 @@ public void setup() {
 
   map = new HashMap<String, Float>();
 
-  map.put("d", 146.83f);
-  map.put("ds", 155.56f);
-  map.put("e", 164.81f);  //q
-  map.put("f", 174.61f);
-  map.put("fs", 185.00f); //w
-  map.put("g", 196.00f);
-  map.put("gs", 207.65f); //e
-  map.put("a", 220.00f);  //r
-  map.put("as", 233.08f);
-  map.put("b", 246.94f);  //t
-  map.put("c", 261.63f);
-  map.put("cs", 277.18f); //y
+  map.put("d", 146.83);
+  map.put("ds", 155.56);
+  map.put("e", 164.81);  //q
+  map.put("f", 174.61);
+  map.put("fs", 185.00); //w
+  map.put("g", 196.00);
+  map.put("gs", 207.65); //e
+  map.put("a", 220.00);  //r
+  map.put("as", 233.08);
+  map.put("b", 246.94);  //t
+  map.put("c", 261.63);
+  map.put("cs", 277.18); //y
 
   noteToNumMap = new HashMap<String, Integer>();
 
@@ -187,7 +167,7 @@ public void setup() {
   for (int i = 0; i <  sines.length; i++) {
     bassSines[i] = new SawOsc(this);
   }
-  bassPlayer = new FilePlayer(.1f, 4 * millisPerBeat * 8, -1);
+  bassPlayer = new FilePlayer(.1, 4 * millisPerBeat * 8, -1);
   bassPlayer.setSong("song2_reformatted.txt", bassSquares, bassSines);
 
 
@@ -200,13 +180,13 @@ public void setup() {
   for (int i = 0; i <  sines.length; i++) {
     backSines[i] = new SawOsc(this);
   }
-  backgroundPlayer = new FilePlayer(.1f, 4 * millisPerBeat * 8, 0);
+  backgroundPlayer = new FilePlayer(.1, 4 * millisPerBeat * 8, 0);
   backgroundPlayer.setSong("song_reformatted.txt", backSquares, backSines);
   
-  jinglePlayer = new FilePlayer(.1f, 0, 0);
+  jinglePlayer = new FilePlayer(.1, 0, 0);
 }
 
-public void startGame() {
+void startGame() {
   health = 1000;
   turnStart = 0;
   damageCounter = 0;
@@ -230,9 +210,9 @@ public void startGame() {
   delay1Over = false;
   delay2Over = false;
 
-  playerWave = new Wave(75.0f, 300, 2, width, barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
-  bossWave1 = new Wave(75.0f, 300, 2, width / 2, barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
-  bossWave2 = new Wave(75.0f, 300, 2, width / 2, barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
+  playerWave = new Wave(75.0, 300, 2, width, barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
+  bossWave1 = new Wave(75.0, 300, 2, width / 2, barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
+  bossWave2 = new Wave(75.0, 300, 2, width / 2, barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
   boss = new Boss();
 
   p1CurrPlaying = new boolean[6];
@@ -246,9 +226,9 @@ public void startGame() {
   boss.r = 100 * uiScale;
 }
 
-public void draw() {
+void draw() {
   background(0);
-  delta = (millis() - lastMillis) / 1000.0f;
+  delta = (millis() - lastMillis) / 1000.0;
   lastMillis = millis();
 
 
@@ -261,7 +241,7 @@ public void draw() {
       fill(255, 255, 255, 0);
       stroke(255, 255, 255, 255);
       // Fix for centering later?
-      image(logo, 0, (height - width / 800.0f * 360) / 2, width, width / 800.0f * 360);
+      image(logo, 0, (height - width / 800.0 * 360) / 2, width, width / 800.0 * 360);
   
       rect(300 * widthScale,130 * uiScale,200 * widthScale,90  * uiScale);
       rect(300 * widthScale, 230 * uiScale, 200 * widthScale, 90 * uiScale);
@@ -340,12 +320,12 @@ public void draw() {
       if (delay2Over) {
         stroke(0, 0, 255);
         for (int i = 0; i < damageToBoss / 10; i++) {
-          float t = (millis() - i * 100 - turnStart - millisPerBeat * barsPerTurn * 3) / (millisPerBeat * barsPerTurn * .4f);
+          float t = (millis() - i * 100 - turnStart - millisPerBeat * barsPerTurn * 3) / (millisPerBeat * barsPerTurn * .4);
           t = sqrt(t);
           
           if (t > 0 && t < 1) {
-            float x = (boss.x - width * 3.0f / 4) * t + width * 3.0f / 4;
-            float y = (boss.y - height * 2.0f / 3) * t + height * 2.0f / 3;
+            float x = (boss.x - width * 3.0 / 4) * t + width * 3.0 / 4;
+            float y = (boss.y - height * 2.0 / 3) * t + height * 2.0 / 3;
             
             line(x, y, x + 20 * uiScale, y);
             line(x, y, x, y + 20 * uiScale);
@@ -378,7 +358,7 @@ public void draw() {
       }
 
       if (flashFrames > 0) {
-        fill(255, 255 * flashFrames / 4.0f);
+        fill(255, 255 * flashFrames / 4.0);
         rect(0, 0, width, height);
         flashFrames--;
       }
@@ -398,12 +378,18 @@ public void draw() {
         delayStart = millis();
         println("delay 2 start");
         
-        damageToBoss = damageCounter * (intervalNotesPlayed + 1) * .6f;
+        damageToBoss = damageCounter * (intervalNotesPlayed + 1) * .6;
         
         damageBoss();
       }
       
       if (millis() - turnStart > millisPerBeat * barsPerTurn * 4) {
+        for (int i = 0; i < squares.length; i++)
+          squares[i].stop();
+        for (int i = 0; i < sines.length; i++)
+          sines[i].stop();
+        playerWave.stopAll();
+        
         turn ++;
         turn %= 4;
         turnStart = millis();
@@ -422,10 +408,10 @@ public void draw() {
       stroke(255, 0, 0);
       for (int i = 0; i < runningPlayerDamage * 1 / 3; i++) {
         line(width - abs(sin(i) * width / 4) * min(i, 4), height - abs(cos(i) * height / 4) * min(i, 4),
-          width - abs(sin(i + .14f) * width / 4) * min(i, 4), height - abs(cos(i + .17f) * height / 4) * min(i, 4));
+          width - abs(sin(i + .14) * width / 4) * min(i, 4), height - abs(cos(i + .17) * height / 4) * min(i, 4));
           
         line(abs(sin(i) * width / 4) * min(i, 4), height - abs(cos(i) * height / 4) * min(i, 4),
-          abs(sin(i + .14f) * width / 4) * min(i, 4), height - abs(cos(i + .17f) * height / 4) * min(i, 4));
+          abs(sin(i + .14) * width / 4) * min(i, 4), height - abs(cos(i + .17) * height / 4) * min(i, 4));
       }
       
       drawUI();
@@ -478,12 +464,15 @@ public void draw() {
       }
 
       if (flashFrames > 0) {
-        fill(255, 255 * flashFrames / 4.0f);
+        fill(255, 255 * flashFrames / 4.0);
         rect(0, 0, width, height);
         flashFrames--;
       }
 
       if (millis() - turnStart > millisPerBeat * barsPerTurn * 4) {
+        bossWave1.stopP2();
+        bossWave2.stopP2();
+        
         for (int i = 0; i < squares.length; i++)
           squares[i].stop();
         for (int i = 0; i < sines.length; i++)
@@ -525,19 +514,19 @@ public void draw() {
   }
 }
 
-public void drawUI() {
+void drawUI() {
   fill(255, 0, 0);
-  rect(0, 0, health / 1000.0f * width, uiScale * 20);
+  rect(0, 0, health / 1000.0 * width, uiScale * 20);
 
-  int keyWidth = (int)(width * .4f);
+  int keyWidth = (int)(width * .4);
   drawKey(p1Active, keyWidth);
   translate(width - keyWidth, 0);
   drawKey(p2Active, keyWidth);
   translate(-(width - keyWidth), 0);
 }
 
-public void drawKey(boolean active, int keyWidth) {
-  float offset = cos((float)(millis() - clickCtr) / millisPerBeat * 2 * PI) * .01f;
+void drawKey(boolean active, int keyWidth) {
+  float offset = cos((float)(millis() - clickCtr) / millisPerBeat * 2 * PI) * .01;
   //translate(-width * offset / 2, -height * offset / 2);
   //scale(1.01 + offset);
 
@@ -551,11 +540,11 @@ public void drawKey(boolean active, int keyWidth) {
       noFill();
     }
 
-    ellipse(keyWidth / 6.0f * j + keyWidth / 12.0f, height - 30 * uiScale, uiScale * 60 * (1 + offset), uiScale * 60 * (1 + offset));
+    ellipse(keyWidth / 6.0 * j + keyWidth / 12.0, height - 30 * uiScale, uiScale * 60 * (1 + offset), uiScale * 60 * (1 + offset));
   }
 }
 
-public void damagePlayer() {
+void damagePlayer() {
   float t = millis();
   float opp1Height = bossWave1.p2Height(t);
   float p1Height = bossWave1.p1Height(t - bossWave1.travelTime);
@@ -563,14 +552,14 @@ public void damagePlayer() {
   damageToPlayer = 0;
 
   if (!bossWave1.matched(t - bossWave1.travelTime)) {
-    damageToPlayer += max(abs(opp1Height - p1Height) / 20 - 2, 0) * 1.5f;
+    damageToPlayer += max(abs(opp1Height - p1Height) / 20 - 2, 0) * 1.5;
   }
 
   float opp2Height = bossWave2.p2Height(t);
   float p2Height = bossWave2.p1Height(t - bossWave2.travelTime);
 
   if (!bossWave2.matched(t - bossWave2.travelTime)) {
-    damageToPlayer += max(abs(opp2Height - p2Height) / 20 - 2, 0) * 1.5f;
+    damageToPlayer += max(abs(opp2Height - p2Height) / 20 - 2, 0) * 1.5;
   }
   
   health -= damageToPlayer;
@@ -578,13 +567,13 @@ public void damagePlayer() {
   runningPlayerDamage += damageToPlayer;
 }
 
-public void damageBoss() {
+void damageBoss() {
   boss.damage(damageToBoss);
   intervalNotesPlayed = 0;
   damageCounter = 0;
 }
 
-public void countBossDamage() {
+void countBossDamage() {
   float t = millis();
   float oppHeight = playerWave.p2Height(t);
 
@@ -593,7 +582,7 @@ public void countBossDamage() {
   }
 }
 
-public void mousePressed() {
+void mousePressed() {
 
   if(!started && mouseX <= 500 * widthScale && mouseX >= 300 * widthScale
     && mouseY <= 210 * uiScale && mouseY >= 120 * uiScale) {
@@ -618,7 +607,7 @@ public void mousePressed() {
   }
 }
 
-public void keyPressed() {
+void keyPressed() {
   //println("pressed " + key);
 
   if (p1Active && p1ButtonToNumMap.containsKey("" + key)) {
@@ -628,7 +617,7 @@ public void keyPressed() {
       p1CurrPlaying[num] = true;
 
       String note = numToNoteMap.get(num);
-      squares[num].play(map.get(note), .2f);
+      squares[num].play(map.get(note), .2);
 
       intervalNotesPlayed += 1;
 
@@ -660,7 +649,7 @@ public void keyPressed() {
   }
 }
 
-public void keyReleased() {
+void keyReleased() {
   //println("released " + key);
   if (p1ButtonToNumMap.containsKey("" + key)) {
     int num = p1ButtonToNumMap.get("" + key);
@@ -701,10 +690,10 @@ public void keyReleased() {
   }
 }
 
-public void drawTutorial(){
+void drawTutorial(){
   if(tutPhases[0]) {
     
-    int keyWidth = (int)(width * .4f);
+    int keyWidth = (int)(width * .4);
     //println(keyWidth);
     drawKey(true, keyWidth);
     translate(width - keyWidth, 0);
@@ -727,7 +716,7 @@ public void drawTutorial(){
     
     
   } else if(tutPhases[1]) {
-    int keyWidth = (int)(width * .4f);
+    int keyWidth = (int)(width * .4);
     //println(keyWidth);
     drawKey(false, keyWidth);
     translate(width - keyWidth, 0);
@@ -747,479 +736,5 @@ public void drawTutorial(){
     rect(600 * widthScale, 150 * uiScale, 100 * widthScale, 50 * uiScale);
     fill(255,255,255,255);
     text("FINISH",650 * widthScale, 180 * uiScale);
-  }
-}
-
-
-class Boss {
-  float health = 500;
-  
-  float x, y, r;
-  
-  public void drawBoss() {
-    colorMode(RGB);
-    stroke(255);
-    fill(0,0,255);
-    rect(0, uiScale * 20, health / 500.0f * width,uiScale * 20);
-    
-    float rotation = millis() * 2 * PI / (millisPerBeat * 4);
-    noFill();
-    float rtR = r / sqrt(2);
-    translate(x, y);
-    rotate(rotation);
-    triangle(0, - r, - rtR, rtR, rtR, rtR);
-    rotate(-2 * rotation);
-    triangle(0, - r, - rtR, rtR, rtR, rtR);
-    rotate(rotation);
-    translate(-x, -y);
-  }
-  
-  public void damage(float d) {
-    health -= d;
-  }
-}
-class FilePlayer {
-  int[] eventTimes;
-  String[] eventNotes;
-  int eventIndex;
-  String[] lines;
-  String songfile;
-  SqrOsc[] squares;
-  SawOsc[] sines;
-  boolean[] currPlaying;
-  int resetTime;
-  float volume;
-  int loopTime;
-  int octave;
-  
-  public FilePlayer() {
-    volume = .2f;
-    loopTime = 0;
-    octave = 0;
-  }
-  
-  public FilePlayer(float v, int lt, int oc) {
-    volume = v;
-    loopTime = lt;
-    octave = oc;
-  }
-  
-  public void setSong(String filename,SqrOsc[] setSquares, SawOsc[] setSines) {
-    int loadMPB = 300;
-    
-    squares = setSquares;
-    sines = setSines;
-    
-    lines = loadStrings(filename);
-    
-    eventTimes = new int[lines.length];
-    eventNotes = new String[lines.length];
-    
-    for(int i=0; i < lines.length; i++){
-      String[] line = splitTokens(lines[i]);
-      
-      eventTimes[i] = PApplet.parseInt(line[1]) * millisPerBeat / loadMPB;
-      eventNotes[i] = line[0];
-      
-    }
-    currPlaying = new boolean[6];
-    for(int j = 0; j < currPlaying.length; j++) {
-      currPlaying[j] = false;
-    }
-  }
-  
-  
-  public void reset() {
-    resetTime = millis();
-    eventIndex = 0;
-    
-    for (int i = 0; i < squares.length; i++) {
-      squares[i].stop();
-      sines[i].stop();
-    }
-  }
-  
-  public void playSong(Wave wave){
-    while(eventIndex < eventTimes.length && millis() - resetTime >= eventTimes[eventIndex]){
-      String noteName = eventNotes[eventIndex];
-      float noteFreq = map.get(noteName) * pow(2, octave);
-      
-      if(noteName.equals("e")){
-        if(currPlaying[0]){
-          squares[0].stop();
-          //numPlaying--;
-          currPlaying[0] = false;
-          if(wave != null) {
-            wave.p1PlayNote("e");
-          }
-          
-        } else {
-          currPlaying[0] = true;
-          //numPlaying += 1;
-          squares[0].play(noteFreq, volume);
-          //timesPressed[0] = millis();
-          if(wave != null) {
-            wave.p1PlayNote("e");
-          //wave.p2PlayNote("e");
-          }
-          
-        }
-      }else if(noteName.equals("fs")){
-        if(currPlaying[1]){
-          squares[1].stop();
-          //numPlaying--;
-          currPlaying[1] = false;
-          if(wave != null) {
-            wave.p1PlayNote("fs");
-          }
-          
-        } else {
-          currPlaying[1] = true;
-          //numPlaying += 1;
-          squares[1].play(noteFreq, volume);
-          //timesPressed[1] = millis();
-          if(wave != null) {
-            wave.p1PlayNote("fs");
-          }
-          
-          //wave.p2PlayNote("fs");
-        }
-      }else if(noteName.equals("gs")){
-        if(currPlaying[2]){
-          squares[2].stop();
-          //numPlaying--;
-          currPlaying[2] = false;
-          if(wave != null) {
-            wave.p1PlayNote("gs");
-          }
-          
-        } else {
-          currPlaying[2] = true;
-          //numPlaying += 1;
-          squares[2].play(noteFreq, volume);
-          //timesPressed[2] = millis();
-          if(wave != null) {
-            wave.p1PlayNote("gs");
-          }
-          
-          //wave.p2PlayNote("gs");
-        }
-      }else if(noteName.equals("a")){
-        if(currPlaying[3]){
-          squares[3].stop();
-          //numPlaying--;
-          currPlaying[3] = false;
-          if(wave != null) {
-            wave.p1PlayNote("a");
-          }
-          
-        } else {
-          currPlaying[3] = true;
-          //numPlaying += 1;
-          
-          squares[3].play(noteFreq, volume);
-          //timesPressed[3] = millis();
-          if(wave != null) {
-            wave.p1PlayNote("a");
-          }
-          
-          //wave.p2PlayNote("a");
-        }
-      }else if(noteName.equals("b")){
-        if(currPlaying[4]){
-          squares[4].stop();
-          //numPlaying--;
-          currPlaying[4] = false;
-          if(wave != null) {
-            wave.p1PlayNote("b");
-          }
-          
-        } else {
-          currPlaying[4] = true;
-          //numPlaying += 1;
-          squares[4].play(noteFreq, volume);
-          //timesPressed[4] = millis();
-          if(wave != null) {
-            wave.p1PlayNote("b");
-          }
-          
-          //wave.p2PlayNote("b");
-        }
-      }else if(noteName.equals("cs")){
-        if(currPlaying[5]){
-          squares[5].stop();
-          //numPlaying--;
-          currPlaying[5] = false;
-          if(wave != null) {
-            wave.p1PlayNote("cs");
-          }
-          
-        } else {
-          currPlaying[5] = true;
-          //numPlaying += 1;
-          squares[5].play(noteFreq, volume);
-          //timesPressed[5] = millis();
-          if(wave != null) {
-            wave.p1PlayNote("cs");
-          }
-          
-          //wave.p2PlayNote("cs");
-        }
-      }
-      
-      eventIndex++;
-    }
-    ////println("lt: " + loopTime);
-    if(loopTime > 0 && millis() - resetTime > loopTime) {
-      reset();
-    }
-  }
-}
-class Wave {
-
-  ArrayList<Integer> p1EventTimes;
-  ArrayList<String> p1EventNotes;
-  
-  ArrayList<Integer> p2EventTimes;
-  ArrayList<String> p2EventNotes;
-  
-  float amplitude;
-  float period;
-  
-  int xspacing;   // How far apart should each horizontal location be spaced
-  int w;              // Width of entire wave
-  int travelTime;  //millis
-  
-  public Wave(float a, float p, int xs, int _w, int tt) {
-    p1EventTimes = new ArrayList<Integer>();
-    p2EventTimes = new ArrayList<Integer>();
-    
-    p1EventNotes = new ArrayList<String>();
-    p2EventNotes = new ArrayList<String>();
-    
-    amplitude = a;
-    period = p;
-    xspacing = xs;
-    w = _w;
-    travelTime = tt;
-  }
-  
-  public void reset() {
-    p1EventTimes = new ArrayList<Integer>();
-    p2EventTimes = new ArrayList<Integer>();
-    
-    p1EventNotes = new ArrayList<String>();
-    p2EventNotes = new ArrayList<String>();
-  }
-  
-  public void drawWave() {
-    noFill();
-    stroke(255);
-    colorMode(HSB);
-    
-    int time = millis();
-    
-    float prev = 0;
-    for (int x = 0; x < w; x += xspacing) {
-      float t = getTime(x, time);
-      
-      float yvalue = p1Height(t);
-      if (x > w * .75f) {
-        if (matched(t)) {
-          yvalue = 0;
-        } else {
-          yvalue -= p2Height(t + travelTime);
-        }
-      }
-      
-      boolean[] p1NotesPlaying = new boolean[squares.length];
-      for (int i = 0; i < p1EventTimes.size(); i++) {
-        if (p1EventTimes.get(i) > t)
-          break;
-        if (noteToNumMap.containsKey(p1EventNotes.get(i))) {
-          int indx = noteToNumMap.get(p1EventNotes.get(i));
-          p1NotesPlaying[indx] = !p1NotesPlaying[indx];
-        }
-      }
-      
-      if (x > 0) {
-        int notes = 0;
-        for (int i = 0; i < 6; i++) {
-          notes += (p1NotesPlaying[i] ? 1 : 0);
-        }
-        
-        int hue = 0;
-        for (int i = 0; i < 6; i++) {
-          hue += (p1NotesPlaying[i] ? 1  : 0) * 42 * i;
-        }
-        if (notes > 0) hue /= notes;
-        
-        int sat = notes == 0 ? 0 : 255;
-                  
-        stroke(hue, sat, 255);
-        
-        line(x - xspacing, prev, x, yvalue);
-      }
-      prev = yvalue;
-    }
-  }
-
-  public float getTime(float x) {
-    return getTime(x, millis());
-  }
-  
-  public float getTime(float x, float time) {
-    return time - (x * 4.0f / 3 / w * travelTime);
-  }
-  
-  public boolean matched(float t) {
-    boolean[] p1NotesPlaying = new boolean[squares.length];
-    for (int i = 0; i < p1EventTimes.size(); i++) {
-      if (p1EventTimes.get(i) > t)
-        break;
-      if (noteToNumMap.containsKey(p1EventNotes.get(i))) {
-        int indx = noteToNumMap.get(p1EventNotes.get(i));
-        p1NotesPlaying[indx] = !p1NotesPlaying[indx];
-      }
-    }
-    
-    boolean[] p2NotesPlaying = new boolean[squares.length];
-    for (int i = 0; i < p2EventTimes.size(); i++) {
-      if (p2EventTimes.get(i) > t + travelTime)
-        break;
-      if (noteToNumMap.containsKey(p2EventNotes.get(i))) {
-        int indx = noteToNumMap.get(p2EventNotes.get(i));
-        p2NotesPlaying[indx] = !p2NotesPlaying[indx];
-      }
-    }
-    
-    boolean equal = true;
-    for (int i = 0;  i < squares.length; i++) {
-      equal = (p1NotesPlaying[i] == p2NotesPlaying[i]);
-      if (!equal)
-        break;
-    }
-    return equal;
-  }
-  
-  public void stopP2() {
-    int t = millis();
-    
-    boolean[] p2NotesPlaying = new boolean[squares.length];
-    for (int i = 0; i < p2EventTimes.size(); i++) {
-      if (p2EventTimes.get(i) > t)
-        break;
-      if (noteToNumMap.containsKey(p2EventNotes.get(i))) {
-        int indx = noteToNumMap.get(p2EventNotes.get(i));
-        p2NotesPlaying[indx] = !p2NotesPlaying[indx];
-      }
-    }
-    
-    for (int i = 0; i < p2NotesPlaying.length; i++) {
-      if (p2NotesPlaying[i])
-        p2PlayNote(numToNoteMap.get(i));
-    }
-  }
-  
-  public void stopP1() {
-    int t = millis();
-    
-    boolean[] p1NotesPlaying = new boolean[squares.length];
-    for (int i = 0; i < p1EventTimes.size(); i++) {
-      if (p1EventTimes.get(i) > t)
-        break;
-      if (noteToNumMap.containsKey(p1EventNotes.get(i))) {
-        int indx = noteToNumMap.get(p1EventNotes.get(i));
-        p1NotesPlaying[indx] = !p1NotesPlaying[indx];
-      }
-    }
-    
-    for (int i = 0; i < p1NotesPlaying.length; i++) {
-      if (p1NotesPlaying[i])
-        p1PlayNote(numToNoteMap.get(i));
-    }
-  }
-  
-  public void stopAll() {
-    //reset();
-    stopP1();
-    stopP2();
-  }
-
-  public float p1Height(float t) {
-    boolean[] notesPlaying = new boolean[squares.length];
-    int[] timesPlaying = new int[squares.length];
-    for (int i = 0; i < p1EventTimes.size(); i++) {
-      if (p1EventTimes.get(i) > t)
-        break;
-      if (noteToNumMap.containsKey(p1EventNotes.get(i))) {
-        int indx = noteToNumMap.get(p1EventNotes.get(i));
-        notesPlaying[indx] = !notesPlaying[indx];
-        timesPlaying[indx] = p1EventTimes.get(i);
-      }
-    }
-    
-    return amplitude *
-       ((notesPlaying[0] ? sin(1/period*(t - timesPlaying[0])) : 0)+
-         (notesPlaying[1] ? sin(2/period*(t - timesPlaying[1])) : 0)+
-          (notesPlaying[2] ? sin(4/period*(t - timesPlaying[2])) : 0)+
-           (notesPlaying[3] ? sin(8/period*(t - timesPlaying[3])) : 0)+
-            (notesPlaying[4] ? sin(16/period*(t - timesPlaying[4])) : 0)+
-             (notesPlaying[5] ? sin(32/period*(t - timesPlaying[5])) : 0));
-  }
-  
-  public float p2Height(float t) {
-    boolean[] notesPlaying = new boolean[squares.length];
-    int[] timesPlaying = new int[squares.length];
-    for (int i = 0; i < p2EventTimes.size(); i++) {
-      if (p2EventTimes.get(i) > t)
-        break;
-      if (noteToNumMap.containsKey(p2EventNotes.get(i))) {
-        int indx = noteToNumMap.get(p2EventNotes.get(i));
-        notesPlaying[indx] = !notesPlaying[indx];
-        timesPlaying[indx] = p2EventTimes.get(i);
-      }
-    }
-  
-    return amplitude *
-       ((notesPlaying[0] ? sin(1/period*(t - timesPlaying[0])) : 0)+
-         (notesPlaying[1] ? sin(2/period*(t - timesPlaying[1])) : 0)+
-          (notesPlaying[2] ? sin(4/period*(t - timesPlaying[2])) : 0)+
-           (notesPlaying[3] ? sin(8/period*(t - timesPlaying[3])) : 0)+
-            (notesPlaying[4] ? sin(16/period*(t - timesPlaying[4])) : 0)+
-             (notesPlaying[5] ? sin(32/period*(t - timesPlaying[5])) : 0));
-  }
-
-  public void drawOpponent() {
-    float x = w * .75f;
-    float t = millis();
-    float oppHeight = p2Height(t);
-    float p1Height = p1Height(t - travelTime);
-    
-    colorMode(RGB);
-    stroke(255, 0, 0);
-    line(x, -oppHeight, x, p1Height);
-    stroke(255);
-    ellipse(x, -oppHeight, 16, 16);
-  }
-  
-  public void p1PlayNote(String note) {
-      p1EventTimes.add((int)(((int)(millis() / (millisPerBeat / 4)) + 1) * (millisPerBeat / 4)));
-      p1EventNotes.add(note);
-  }
-  
-  public void p2PlayNote(String note) {
-      p2EventTimes.add((int)(((int)(millis() / (millisPerBeat / 4)) + 1) * (millisPerBeat / 4)));
-      p2EventNotes.add(note);
-  }
-}
-  public void settings() {  fullScreen(); }
-  static public void main(String[] passedArgs) {
-    String[] appletArgs = new String[] { "damageBoss" };
-    if (passedArgs != null) {
-      PApplet.main(concat(appletArgs, passedArgs));
-    } else {
-      PApplet.main(appletArgs);
-    }
   }
 }
