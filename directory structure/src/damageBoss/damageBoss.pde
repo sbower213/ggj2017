@@ -204,6 +204,10 @@ void startGame() {
   
   backgroundPlayer.reset();
   bassPlayer.reset();
+  
+  boss.x = width / 2;
+  boss.y = height / 3;
+  boss.r = 100;
 }
 
 void draw() {
@@ -245,19 +249,21 @@ void draw() {
     bassPlayer.playSong(null);
     
     if (turn % 2 == 0) {
+      drawUI();
+      
       if (turn == 2) {
         scale(-1, 1);
         translate(-width, 0);
       }
+      translate(0, height * 2 / 3);
       playerWave.drawWave();
+      translate(0, -height * 2 / 3);
       
       playerWave.drawOpponent();
       if (turn == 2) {
         translate(width, 0);
         scale(-1, 1);
       }
-      
-      drawUI();
       
       boss.drawBoss();
       
@@ -321,17 +327,17 @@ void draw() {
         p2Active = false;
       }
     } else {
+      drawUI();
+      
+      translate(width/2, height / 2);
+      scale(-1, 1);
       bossWave1.drawWave();
       bossWave1.drawOpponent();
-      
-      translate(width, 0);
       scale(-1, 1);
+      
       bossWave2.drawWave();
       bossWave2.drawOpponent();
-      scale(-1, 1);
-      translate(-width, 0);
-      
-      drawUI();
+      translate(-width/2, -height / 2);
       
       boss.drawBoss();
 

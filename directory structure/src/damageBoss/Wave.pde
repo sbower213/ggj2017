@@ -81,9 +81,9 @@ class Wave {
                   
         stroke(hue, sat, 255);
         
-        line(x - xspacing, prev, x, height / 2 + yvalue);
+        line(x - xspacing, prev, x, yvalue);
       }
-      prev = height / 2 + yvalue;
+      prev = yvalue;
     }
   }
 
@@ -211,9 +211,9 @@ class Wave {
     
     colorMode(RGB);
     stroke(255, 0, 0);
-    line(x, height/2 - oppHeight, x, height/2 + p1Height);
+    line(x, -oppHeight, x, p1Height);
     stroke(255);
-    ellipse(x, height / 2  - oppHeight, 16, 16);
+    ellipse(x, -oppHeight, 16, 16);
   }
   
   void p1PlayNote(String note) {
