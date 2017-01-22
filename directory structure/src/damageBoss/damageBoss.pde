@@ -44,7 +44,7 @@ String[] riff1s = {"riff_1a.txt", "riff_2a.txt", "riff_3a.txt"};
 String[] riff2s = {"riff_1b.txt", "riff_2b.txt", "riff_3b.txt"};
 int curRiff;
 
-boolean started;
+boolean started, learning = false;
 PImage logo;
 
 boolean p1Active;
@@ -52,6 +52,7 @@ boolean p2Active;
 
 boolean over = false;
 boolean lost = false;
+boolean tutPhases = [false,false,false];
 
 float uiScale;
 float widthScale;
@@ -225,9 +226,11 @@ void draw() {
     // Fix for centering later?
     image(logo, 0, (height - width / 800.0 * 360) / 2, width, width / 800.0 * 360);
     rect(300 * widthScale,130 * uiScale,200 * widthScale,90  * uiScale);
+    rect(300 * widthScale, 230 * uiScale, 200 * widthScale, 90 * uiScale);
     fill(255,255,255,255);
 //    text("WAVE BATTLE", 400, 60);
     text("START GAME", 400 * widthScale, 180 * uiScale);
+    text("HOW TO PLAY", 400 * widthScale, 280 * uiScale);
     
     if (over) {
       if (lost) {
@@ -237,6 +240,8 @@ void draw() {
         fill(0, 255, 255);
         text("YOU WIN", 400 * widthScale, 60 * uiScale);
       }
+    } else if(learning) {
+      println("Learning at " + millis());
     }
   } else {
     if(millis() > clickCtr){
@@ -498,6 +503,12 @@ void mousePressed() {
     
     startGame();
   }
+  if(!started && mouseX <= 500 * widthScale && mouseX >= 300 * widthScale
+    && mouseY >= 230 && mouseY <= 320) {
+      learning = true;
+      
+      startTutorial();
+    }
 }
 
 void keyPressed() {
@@ -574,4 +585,8 @@ void keyReleased() {
     else
       bossWave2.p2PlayNote(note);
   }
+}
+
+void startTutorial(){
+  
 }
