@@ -25,6 +25,8 @@ class Boss {
   }
   
   void setSong(String filename,SqrOsc[] setSquares, SinOsc[] setSines) {
+    int loadMPB = 300;
+    
     squares = setSquares;
     sines = setSines;
     
@@ -36,7 +38,7 @@ class Boss {
     for(int i=0; i < lines.length; i++){
       String[] line = splitTokens(lines[i]);
       
-      eventTimes[i] = int(line[1]);
+      eventTimes[i] = int(line[1]) * millisPerBeat / loadMPB;
       eventNotes[i] = line[0];
       
     }
@@ -53,7 +55,6 @@ class Boss {
   }
   
   void playSong(Wave wave1, Wave wave2){
-    println("m: " + (millis() - resetTime));
     while(eventIndex < eventTimes.length && millis() - resetTime >= eventTimes[eventIndex]){
       String noteName = eventNotes[eventIndex];
       float noteFreq = map.get(noteName);
@@ -63,6 +64,8 @@ class Boss {
           squares[0].stop();
           //numPlaying--;
           currPlaying[0] = false;
+          wave1.p1PlayNote("e");
+          wave2.p1PlayNote("e");
         } else {
           currPlaying[0] = true;
           //numPlaying += 1;
@@ -78,6 +81,8 @@ class Boss {
           squares[1].stop();
           //numPlaying--;
           currPlaying[1] = false;
+          wave1.p1PlayNote("fs");
+          wave2.p1PlayNote("fs");
         } else {
           println("started fs");
           currPlaying[1] = true;
@@ -93,6 +98,8 @@ class Boss {
           squares[2].stop();
           //numPlaying--;
           currPlaying[2] = false;
+          wave1.p1PlayNote("gs");
+          wave2.p1PlayNote("gs");
         } else {
           currPlaying[2] = true;
           //numPlaying += 1;
@@ -104,10 +111,14 @@ class Boss {
         }
       }else if(noteName.equals("a")){
         if(currPlaying[3]){
+          println("stopped a");
           squares[3].stop();
           //numPlaying--;
           currPlaying[3] = false;
+          wave1.p1PlayNote("a");
+          wave2.p1PlayNote("a");
         } else {
+          println("started a");
           currPlaying[3] = true;
           //numPlaying += 1;
           squares[3].play(noteFreq, .4);
@@ -121,6 +132,8 @@ class Boss {
           squares[4].stop();
           //numPlaying--;
           currPlaying[4] = false;
+          wave1.p1PlayNote("b");
+          wave2.p1PlayNote("b");
         } else {
           currPlaying[4] = true;
           //numPlaying += 1;
@@ -135,6 +148,8 @@ class Boss {
           squares[5].stop();
           //numPlaying--;
           currPlaying[5] = false;
+          wave1.p1PlayNote("cs");
+          wave2.p1PlayNote("cs");
         } else {
           currPlaying[5] = true;
           //numPlaying += 1;
