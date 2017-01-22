@@ -576,7 +576,7 @@ void keyPressed() {
       p2CurrPlaying[num] = true;
 
       String note = numToNoteMap.get(num);
-      sines[num].play(map.get(note), .4);
+      sines[num].play(map.get(note), 1);
 
       if (turn == 2)
         playerWave.p1PlayNote(note);
