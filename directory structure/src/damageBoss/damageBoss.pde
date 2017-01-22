@@ -228,31 +228,33 @@ void draw() {
 
 
   if (!started) {
+    if(learning) {
+      drawTutorial();
+    } else {
 
-    textSize(16 * uiScale);
-    textAlign(CENTER);
-    fill(255, 255, 255, 0);
-    stroke(255, 255, 255, 255);
-    // Fix for centering later?
-    image(logo, 0, (height - width / 800.0 * 360) / 2, width, width / 800.0 * 360);
-
-    rect(300 * widthScale,130 * uiScale,200 * widthScale,90  * uiScale);
-    rect(300 * widthScale, 230 * uiScale, 200 * widthScale, 90 * uiScale);
-    fill(255,255,255,255);
-//    text("WAVE BATTLE", 400, 60);
-    text("START GAME", 400 * widthScale, 180 * uiScale);
-    text("HOW TO PLAY", 400 * widthScale, 280 * uiScale);
-    
-    if (over) {
-      if (lost) {
-        fill(255, 0, 0);
-        text("YOU LOSE", 400 * widthScale, 60 * uiScale);
-      } else {
-        fill(0, 255, 255);
-        text("YOU WIN", 400 * widthScale, 60 * uiScale);
+      textSize(16 * uiScale);
+      textAlign(CENTER);
+      fill(255, 255, 255, 0);
+      stroke(255, 255, 255, 255);
+      // Fix for centering later?
+      image(logo, 0, (height - width / 800.0 * 360) / 2, width, width / 800.0 * 360);
+  
+      rect(300 * widthScale,130 * uiScale,200 * widthScale,90  * uiScale);
+      rect(300 * widthScale, 230 * uiScale, 200 * widthScale, 90 * uiScale);
+      fill(255,255,255,255);
+  //    text("WAVE BATTLE", 400, 60);
+      text("START GAME", 400 * widthScale, 180 * uiScale);
+      text("HOW TO PLAY", 400 * widthScale, 280 * uiScale);
+      
+      if (over) {
+        if (lost) {
+          fill(255, 0, 0);
+          text("YOU LOSE", 400 * widthScale, 60 * uiScale);
+        } else {
+          fill(0, 255, 255);
+          text("YOU WIN", 400 * widthScale, 60 * uiScale);
+        }
       }
-    } else if(learning) {
-      println("Learning at " + millis());
     }
   } else {
     if (millis() > clickCtr) {
@@ -371,7 +373,11 @@ void draw() {
          bossWave1.travelTime = 4 * barsPerTurn * millisPerBeat;
          }*/
       }
-    } else {
+    } else if(learning) {
+      
+      drawTutorial();
+      
+    }  else {
       drawUI();
       
       translate(width/2, height / 2);
@@ -513,16 +519,10 @@ void damagePlayer() {
 }
 
 void damageBoss() {
-  /*println("counter: " + damageCounter);
-   println("modifier: " + (intervalNotesPlayed + 1));*/
   float damageToBoss = damageCounter * (intervalNotesPlayed + 1) * .6;
   boss.damage(damageToBoss);
   intervalNotesPlayed = 0;
   damageCounter = 0;
-  /*println("Negative Damage: " + damageCounter);
-   println("Number of notes stacked: " + intervalNotesPlayed);
-   println("Damage to Boss: " + damageToBoss);
-   println("********************************************************************");*/
 }
 
 void countBossDamage() {
@@ -536,19 +536,27 @@ void countBossDamage() {
 
 void mousePressed() {
 
-  if (!started && mouseX <= 500 * widthScale && mouseX >= 300 * widthScale
+  if(!started && mouseX <= 500 * widthScale && mouseX >= 300 * widthScale
     && mouseY <= 210 * uiScale && mouseY >= 120 * uiScale) {
     // Enter start game conditions here.
     started = true;
-
+    
     startGame();
   }
   if(!started && mouseX <= 500 * widthScale && mouseX >= 300 * widthScale
-    && mouseY >= 230 && mouseY <= 320) {
+    && mouseY >= 230 * uiScale && mouseY <= 320 * uiScale) {
       learning = true;
-      
-      startTutorial();
-    }
+      tutPhases[0] = true;
+      //drawTutorial();
+  } else if(learning && tutPhases[0] && mouseX <= 700 * widthScale && mouseX >= 600 * widthScale
+    && mouseY >= 150 * uiScale && uiScale <= 200 * uiScale) {
+      tutPhases[0] = false;
+      tutPhases[1] = true;
+  } else if(learning && tutPhases[1] && mouseX <= 700 * widthScale && mouseX >= 600 * widthScale
+    && mouseY >= 150 * uiScale && uiScale <= 200 * uiScale) {
+     tutPhases[1] = false;
+     learning = false;
+  }
 }
 
 void keyPressed() {
@@ -626,6 +634,51 @@ void keyReleased() {
   }
 }
 
-void startTutorial(){
-  
+void drawTutorial(){
+  if(tutPhases[0]) {
+    
+    int keyWidth = (int)(width * .4);
+    //println(keyWidth);
+    drawKey(true, keyWidth);
+    translate(width - keyWidth, 0);
+    drawKey(false, keyWidth);
+    translate(-(width - keyWidth),0);
+    colorMode(RGB);
+    fill(255,255,255,255);
+    stroke(255,255,255,255);
+    text("FOR PLAYER 1", 400 * widthScale, 50 * uiScale);
+    fill(0,0,0,255);
+    text("Q", 25 * widthScale, 330 * uiScale);
+    text("W", 80 * widthScale, 330 * uiScale);
+    text("E", 130 * widthScale, 330 * uiScale);
+    text("R", 185 * widthScale, 330 * uiScale);
+    text("T", 240 * widthScale, 330 * uiScale);
+    text("Y", 290 * widthScale, 330 * uiScale);
+    rect(600 * widthScale, 150 * uiScale, 100 * widthScale, 50 * uiScale);
+    fill(255,255,255,255);
+    text("NEXT",650 * widthScale, 180 * uiScale);
+    
+    
+  } else if(tutPhases[1]) {
+    int keyWidth = (int)(width * .4);
+    //println(keyWidth);
+    drawKey(false, keyWidth);
+    translate(width - keyWidth, 0);
+    drawKey(true, keyWidth);
+    translate(-(width - keyWidth),0);
+    colorMode(RGB);
+    fill(255,255,255,255);
+    stroke(255,255,255,255);
+    text("FOR PLAYER 2", 400 * widthScale, 50 * uiScale);
+    fill(0,0,0,255);
+    text("G", 505 * widthScale, 330 * uiScale);
+    text("H", 560 * widthScale, 330 * uiScale);
+    text("J", 615 * widthScale, 330 * uiScale);
+    text("K", 665 * widthScale, 330 * uiScale);
+    text("L", 720 * widthScale, 330 * uiScale);
+    text(";", 770 * widthScale, 330 * uiScale);
+    rect(600 * widthScale, 150 * uiScale, 100 * widthScale, 50 * uiScale);
+    fill(255,255,255,255);
+    text("FINISH",650 * widthScale, 180 * uiScale);
+  }
 }
