@@ -384,6 +384,12 @@ void draw() {
       }
       
       if (millis() - turnStart > millisPerBeat * barsPerTurn * 4) {
+        for (int i = 0; i < squares.length; i++)
+          squares[i].stop();
+        for (int i = 0; i < sines.length; i++)
+          sines[i].stop();
+        playerWave.stopAll();
+        
         turn ++;
         turn %= 4;
         turnStart = millis();
@@ -464,6 +470,9 @@ void draw() {
       }
 
       if (millis() - turnStart > millisPerBeat * barsPerTurn * 4) {
+        bossWave1.stopP2();
+        bossWave2.stopP2();
+        
         for (int i = 0; i < squares.length; i++)
           squares[i].stop();
         for (int i = 0; i < sines.length; i++)
