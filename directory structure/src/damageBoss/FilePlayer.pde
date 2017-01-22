@@ -86,7 +86,6 @@ class FilePlayer {
         }
       }else if(noteName.equals("fs")){
         if(currPlaying[1]){
-          println("stopped fs");
           squares[1].stop();
           //numPlaying--;
           currPlaying[1] = false;
@@ -95,7 +94,6 @@ class FilePlayer {
           }
           
         } else {
-          println("started fs");
           currPlaying[1] = true;
           //numPlaying += 1;
           squares[1].play(noteFreq, volume);
@@ -128,7 +126,6 @@ class FilePlayer {
         }
       }else if(noteName.equals("a")){
         if(currPlaying[3]){
-          println("stopped a");
           squares[3].stop();
           //numPlaying--;
           currPlaying[3] = false;
@@ -137,7 +134,6 @@ class FilePlayer {
           }
           
         } else {
-          println("started a");
           currPlaying[3] = true;
           //numPlaying += 1;
           
@@ -161,7 +157,6 @@ class FilePlayer {
         } else {
           currPlaying[4] = true;
           //numPlaying += 1;
-          println(squares[4]);
           squares[4].play(noteFreq, volume);
           //timesPressed[4] = millis();
           if(wave != null) {

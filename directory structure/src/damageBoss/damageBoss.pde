@@ -288,7 +288,6 @@ void draw() {
         filePlayer2.setSong(riff2s[curRiff], squares, sines);
         curRiff++;
         curRiff %= riff1s.length;
-        println("riff: " + curRiff);
         
         if (turn == 0) {
           p1Active = false;
@@ -358,8 +357,8 @@ void draw() {
           squares[i].stop();
         for (int i = 0; i < sines.length; i++)
           sines[i].stop();
-        bossWave1.stopAll();
-        bossWave2.stopAll();
+        bossWave1.stopP2();
+        bossWave2.stopP2();
         
         switchedPlayers = true;
         
@@ -371,8 +370,8 @@ void draw() {
           squares[i].stop();
         for (int i = 0; i < sines.length; i++)
           sines[i].stop();
-        bossWave1.stopAll();
-        bossWave2.stopAll();
+        bossWave1.stopP2();
+        bossWave2.stopP2();
         
         nextPhase = true;
         flashFrames = 4;
