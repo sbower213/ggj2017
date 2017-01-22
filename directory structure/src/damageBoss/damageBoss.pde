@@ -63,8 +63,8 @@ boolean delay;
 int delayStart;
 
 void setup() {
-    fullScreen();
-  //size(800, 360);
+  //fullScreen();
+  size(800, 360);
   background(255);
 
   uiScale = height / 360;
@@ -295,7 +295,6 @@ void draw() {
         text(countdown, width/2, height/4);
       }
       
-      println(millis() - turnStart);
       if (!delay1Over && millis() - turnStart > millisPerBeat * barsPerTurn) {
         if (turn == 0) {
           p1Active = true;
@@ -440,10 +439,13 @@ void draw() {
         turn %= 4;
         println("turn: " + turn);
         turnStart = millis();
-        barsPerTurn = 4;
         switchedPlayers = false;
         nextPhase = false;
         delayStart = millis();
+        delay1Over = false;
+        delay2Over = false;
+        p1Active = false;
+        p2Active = false;
       }
     }
 
