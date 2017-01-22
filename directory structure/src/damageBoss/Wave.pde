@@ -164,6 +164,7 @@ class Wave {
   }
   
   void stopAll() {
+    //reset();
     stopP1();
     stopP2();
   }
