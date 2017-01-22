@@ -20,6 +20,7 @@ class Boss {
     rotate(-2 * rotation);
     triangle(0, - r, - rtR, rtR, rtR, rtR);
     rotate(rotation);
+    translate(-x, -y);
   }
   
   void damage(float d) {
