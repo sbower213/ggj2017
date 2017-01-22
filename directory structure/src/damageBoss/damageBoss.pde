@@ -47,6 +47,9 @@ int curRiff;
 boolean started;
 PImage logo;
 
+boolean p1Active = true;
+boolean p2Active = false;
+
 void setup() {
   size(800, 360);
   background(255);
@@ -201,6 +204,14 @@ void draw() {
         curRiff++;
         curRiff %= riff1s.length;
         println("riff: " + curRiff);
+        
+        if (turn == 0) {
+          p1Active = false;
+          p2Active = true;
+        } else {
+          p1Active = true;
+          p2Active = false;
+        }
       }
       
       if (flashFrames > 0) {
@@ -232,6 +243,9 @@ void draw() {
           bossWave1.travelTime = 4 * barsPerTurn * millisPerBeat;
         }*/
         barsPerTurn = 6;
+        
+        p1Active = false;
+        p2Active = false;
       }
     } else {
       bossWave1.drawWave();
@@ -277,6 +291,9 @@ void draw() {
         
         nextPhase = true;
         flashFrames = 4;
+        
+        p1Active = true;
+        p2Active = true;
       }
       
       if (flashFrames > 0) {
@@ -299,6 +316,14 @@ void draw() {
         barsPerTurn = 4;
         switchedPlayers = false;
         nextPhase = false;
+        
+        if (turn == 0) {
+          p1Active = true;
+          p2Active = false;
+        } else {
+          p1Active = false;
+          p2Active = true;
+        }
       }
     }
   }
@@ -367,130 +392,77 @@ void mousePressed() {
 }
 
 void keyPressed() {
-  
-  if (turn % 2 == 0) {
-    if (((turn == 0 && millis() - turnStart < millisPerBeat * barsPerTurn * 2) ||
-      (turn == 2 && millis() - turnStart >= millisPerBeat * barsPerTurn * 2))
-        && p1ButtonToNumMap.containsKey("" + key)) {
-      int num = p1ButtonToNumMap.get("" + key);
-      
-      if (!p1CurrPlaying[num]) {
-        p1CurrPlaying[num] = true;
-        
-        String note = numToNoteMap.get(num);
-        squares[num].play(map.get(note), .4);
-        
-        intervalNotesPlayed += 1;
-      
-        if (turn == 0)
-          playerWave.p1PlayNote(note);
-        else
-          playerWave.p2PlayNote(note);
-      }
-    }
+
+  if (p1Active && p1ButtonToNumMap.containsKey("" + key)) {
+    int num = p1ButtonToNumMap.get("" + key);
     
-    if (((turn == 2 && millis() - turnStart < millisPerBeat * barsPerTurn * 2) ||
-      (turn == 0 && millis() - turnStart >= millisPerBeat * barsPerTurn * 2))
-        && p2ButtonToNumMap.containsKey("" + key)) {
-      int num = p2ButtonToNumMap.get("" + key);
+    if (!p1CurrPlaying[num]) {
+      p1CurrPlaying[num] = true;
       
-      if (!p2CurrPlaying[num]) {
-        p2CurrPlaying[num] = true;
-        
-        String note = numToNoteMap.get(num);
-        sines[num].play(map.get(note), .4);
-        
-        if (turn == 2)
-          playerWave.p1PlayNote(note);
-        else
-          playerWave.p2PlayNote(note);
-      }
-    }
-  } else {
-    if (p1ButtonToNumMap.containsKey("" + key)) {
-      int num = p1ButtonToNumMap.get("" + key);
+      String note = numToNoteMap.get(num);
+      squares[num].play(map.get(note), .4);
       
-      if (!p1CurrPlaying[num]) {
-        p1CurrPlaying[num] = true;
-        
-        String note = numToNoteMap.get(num);
-        squares[num].play(map.get(note), .4);
-        
-        intervalNotesPlayed += 1;
-      
+      intervalNotesPlayed += 1;
+    
+      if (turn == 0)
+        playerWave.p1PlayNote(note);
+      else if (turn == 2)
+        playerWave.p2PlayNote(note);
+      else
         bossWave1.p2PlayNote(note);
-      }
     }
+  }
+  
+  if (p2Active && p2ButtonToNumMap.containsKey("" + key)) {
+    int num = p2ButtonToNumMap.get("" + key);
     
-    if (p2ButtonToNumMap.containsKey("" + key)) {
-      int num = p2ButtonToNumMap.get("" + key);
+    if (!p2CurrPlaying[num]) {
+      p2CurrPlaying[num] = true;
       
-      if (!p2CurrPlaying[num]) {
-        p2CurrPlaying[num] = true;
-        
-        String note = numToNoteMap.get(num);
-        sines[num].play(map.get(note), .4);
-        
+      String note = numToNoteMap.get(num);
+      sines[num].play(map.get(note), .4);
+      
+      if (turn == 2)
+        playerWave.p1PlayNote(note);
+      else if (turn == 0)
+        playerWave.p2PlayNote(note);
+      else
         bossWave2.p2PlayNote(note);
-      }
+        
     }
   }
 }
 
 void keyReleased() {
-  if (turn % 2 == 0) {
-    if (((turn == 0 && millis() - turnStart < millisPerBeat * barsPerTurn * 2) ||
-      (turn == 2 && millis() - turnStart >= millisPerBeat * barsPerTurn * 2))
-        && p1ButtonToNumMap.containsKey("" + key)) {
-      int num = p1ButtonToNumMap.get("" + key);
-      
-      p1CurrPlaying[num] = false;
-      
-      String note = numToNoteMap.get(num);
-      squares[num].stop();
-      
-      if (turn == 0)
-        playerWave.p1PlayNote(note);
-      else
-        playerWave.p2PlayNote(note);
-    }
+  if (p1Active && p1ButtonToNumMap.containsKey("" + key)) {
+    int num = p1ButtonToNumMap.get("" + key);
     
-    if (((turn == 2 && millis() - turnStart < millisPerBeat * barsPerTurn * 2) ||
-      (turn == 0 && millis() - turnStart >= millisPerBeat * barsPerTurn * 2))
-        && p2ButtonToNumMap.containsKey("" + key)) {
-      int num = p2ButtonToNumMap.get("" + key);
-      
-      p2CurrPlaying[num] = false;
-      
-      String note = numToNoteMap.get(num);
-      sines[num].stop();
-        
-      if (turn == 2)
-        playerWave.p1PlayNote(note);
-      else
-        playerWave.p2PlayNote(note);
-    }
-  } else {
-    if (p1ButtonToNumMap.containsKey("" + key)) {
-      int num = p1ButtonToNumMap.get("" + key);
-      
-      p1CurrPlaying[num] = false;
-      
-      String note = numToNoteMap.get(num);
-      squares[num].stop();
-      
+    p1CurrPlaying[num] = false;
+    
+    String note = numToNoteMap.get(num);
+    squares[num].stop();
+    
+    if (turn == 0)
+      playerWave.p1PlayNote(note);
+    else if (turn == 2)
+      playerWave.p2PlayNote(note);
+    else
       bossWave1.p2PlayNote(note);
-    }
+  }
+  
+  if (p2Active && p2ButtonToNumMap.containsKey("" + key)) {
+    int num = p2ButtonToNumMap.get("" + key);
     
-    if (p2ButtonToNumMap.containsKey("" + key)) {
-      int num = p2ButtonToNumMap.get("" + key);
+    p2CurrPlaying[num] = false;
+    
+    String note = numToNoteMap.get(num);
+    sines[num].stop();
       
-      p2CurrPlaying[num] = false;
-      
-      String note = numToNoteMap.get(num);
-      sines[num].stop();
-        
+    if (turn == 2)
+      playerWave.p1PlayNote(note);
+    else if (turn == 0)
+      playerWave.p2PlayNote(note);
+    else
       bossWave2.p2PlayNote(note);
-    }
   }
 }
