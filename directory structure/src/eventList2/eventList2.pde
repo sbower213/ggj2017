@@ -19,10 +19,12 @@ boolean[] p2CurrPlaying = {false, false, false, false, false, false};
 int health = 1000;
 
 Wave wave;
+FilePlayer filePlayer;
 
 void setup() {
   size(800, 360);
   background(255);
+  
   
   squares = new SqrOsc[6];
   for (int i = 0; i < squares.length; i++) {
@@ -37,6 +39,9 @@ void setup() {
   wave = new Wave(75.0, 300, 2, 656, 2000);
   
   map = new HashMap<String,Float>();
+  
+  filePlayer = new FilePlayer();
+  filePlayer.setSong("song2_reformatted.txt",squares,sines);
   
   map.put("d", 146.83);
   map.put("ds", 155.56);
@@ -108,6 +113,7 @@ void draw() {
   wave.drawOpponent();
   
   drawUI();
+  filePlayer.playSong(wave);
 }
 
 void drawUI() {
