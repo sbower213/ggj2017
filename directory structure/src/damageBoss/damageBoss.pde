@@ -333,12 +333,26 @@ void drawUI() {
   fill(255,0,0);
   rect(0, 0, health / 1000.0 * width,20);
   
+  int keyWidth = (int)(width * .4);
+  drawKey(p1Active, keyWidth);
+  translate(width - keyWidth, 0);
+  drawKey(p2Active, keyWidth);
+  translate(-(width - keyWidth), 0);
+  
+}
+
+void drawKey(boolean active, int keyWidth) {
   colorMode(HSB);
   for (int j = 0; j < 6; j++) {
-    fill(42 * j, 255, 255);
-    noStroke();
+    if (active) {
+      fill(42 * j, 255, 255);
+      noStroke();
+    } else {
+      stroke(42 * j, 255, 255);
+      noFill();
+    }
     
-    ellipse(width / 6.0 * j + width / 12.0, height - 30, 60, 60);
+    ellipse(keyWidth / 6.0 * j + keyWidth / 12.0, height - 30, 60, 60);
   }
 }
 
