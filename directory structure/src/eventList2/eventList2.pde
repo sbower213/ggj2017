@@ -8,7 +8,8 @@ SqrOsc[] squares;
 SinOsc[] sines;
 
 HashMap<String, Float> map;
-HashMap<String, Integer> buttonToNumMap;
+HashMap<String, Integer> p1ButtonToNumMap;
+HashMap<String, Integer> p2ButtonToNumMap;
 HashMap<Integer, String> numToNoteMap;
 HashMap<String, Integer> noteToNumMap;
 
@@ -18,7 +19,8 @@ ArrayList<String> p1EventNotes;
 ArrayList<Integer> p2EventTimes;
 ArrayList<String> p2EventNotes;
 
-boolean[] currPlaying = {false, false, false, false, false, false};
+boolean[] p1CurrPlaying = {false, false, false, false, false, false};
+boolean[] p2CurrPlaying = {false, false, false, false, false, false};
 
 float amplitude = 75.0;
 float period = 300;
@@ -66,21 +68,6 @@ void setup() {
   map.put("c", 261.63);
   map.put("cs", 277.18); //y
   
-  buttonToNumMap = new HashMap<String,Integer>();
-  
-  buttonToNumMap.put("q", 0);  //q
-  buttonToNumMap.put("w", 1); //w
-  buttonToNumMap.put("e", 2); //e
-  buttonToNumMap.put("r", 3);  //r
-  buttonToNumMap.put("t", 4);  //t
-  buttonToNumMap.put("y", 5); //y
-  buttonToNumMap.put("Q", 0);  //q
-  buttonToNumMap.put("W", 1); //w
-  buttonToNumMap.put("E", 2); //e
-  buttonToNumMap.put("R", 3);  //r
-  buttonToNumMap.put("T", 4);  //t
-  buttonToNumMap.put("Y", 5); //y
-  
   noteToNumMap = new HashMap<String,Integer>();
   
   noteToNumMap.put("e", 0);  //q
@@ -98,6 +85,36 @@ void setup() {
   numToNoteMap.put(3, "a");  //r
   numToNoteMap.put(4, "b");  //t
   numToNoteMap.put(5, "cs"); //y
+  
+  p1ButtonToNumMap = new HashMap<String,Integer>();
+  
+  p1ButtonToNumMap.put("q", 0);  //q
+  p1ButtonToNumMap.put("w", 1); //w
+  p1ButtonToNumMap.put("e", 2); //e
+  p1ButtonToNumMap.put("r", 3);  //r
+  p1ButtonToNumMap.put("t", 4);  //t
+  p1ButtonToNumMap.put("y", 5); //y
+  p1ButtonToNumMap.put("Q", 0);  //q
+  p1ButtonToNumMap.put("W", 1); //w
+  p1ButtonToNumMap.put("E", 2); //e
+  p1ButtonToNumMap.put("R", 3);  //r
+  p1ButtonToNumMap.put("T", 4);  //t
+  p1ButtonToNumMap.put("Y", 5); //y
+  
+  p2ButtonToNumMap = new HashMap<String,Integer>();
+  
+  p2ButtonToNumMap.put("g", 0);  //q
+  p2ButtonToNumMap.put("h", 1); //w
+  p2ButtonToNumMap.put("j", 2); //e
+  p2ButtonToNumMap.put("k", 3);  //r
+  p2ButtonToNumMap.put("l", 4);  //t
+  p2ButtonToNumMap.put(";", 5); //y
+  p2ButtonToNumMap.put("G", 0);  //q
+  p2ButtonToNumMap.put("H", 1); //w
+  p2ButtonToNumMap.put("J", 2); //e
+  p2ButtonToNumMap.put("K", 3);  //r
+  p2ButtonToNumMap.put("L", 4);  //t
+  p2ButtonToNumMap.put(":", 5); //y
 }
 
 void draw() {
@@ -114,9 +131,9 @@ void drawWave() {
   
   float prev = -131313;
   for (int x = 0; x < w; x += xspacing) {
-    boolean[] notesPlaying = new boolean[squares.length];
-    int[] timesPlaying = new int[squares.length];
-    float t = time - (x * 1.0 / w * travelTime);
+    boolean[] notesPlaying = new boolean[squares.length * 2];
+    int[] timesPlaying = new int[squares.length * 2];
+    float t = time - (x * 4.0 / 3 / w * travelTime);
     
     for (int i = 0; i < p1EventTimes.size(); i++) {
       if (p1EventTimes.get(i) > t)
@@ -128,13 +145,31 @@ void drawWave() {
       }
     }
     
+    if (x >= w * .75) {
+      for (int i = 0; i < p2EventTimes.size(); i++) {
+        if (p2EventTimes.get(i) > t + travelTime)
+          break;
+        if (noteToNumMap.containsKey(p2EventNotes.get(i))) {
+          int indx = noteToNumMap.get(p2EventNotes.get(i));
+          notesPlaying[indx + squares.length] = !notesPlaying[indx + squares.length];
+          timesPlaying[indx + squares.length] = p2EventTimes.get(i);
+        }
+      }
+    }
+    
     float yvalue = amplitude *
      ((notesPlaying[0] ? sin(1/period*(t - timesPlaying[0])) : 0)+
        (notesPlaying[1] ? sin(2/period*(t - timesPlaying[1])) : 0)+
         (notesPlaying[2] ? sin(4/period*(t - timesPlaying[2])) : 0)+
          (notesPlaying[3] ? sin(8/period*(t - timesPlaying[3])) : 0)+
           (notesPlaying[4] ? sin(16/period*(t - timesPlaying[4])) : 0)+
-           (notesPlaying[5] ? sin(32/period*(t - timesPlaying[5])) : 0));
+           (notesPlaying[5] ? sin(32/period*(t - timesPlaying[5])) : 0)-
+        ((notesPlaying[6] ? sin(1/period*(t - timesPlaying[6])) : 0)+
+         (notesPlaying[7] ? sin(2/period*(t - timesPlaying[7])) : 0)+
+          (notesPlaying[8] ? sin(4/period*(t - timesPlaying[8])) : 0)+
+           (notesPlaying[9] ? sin(8/period*(t - timesPlaying[9])) : 0)+
+            (notesPlaying[10] ? sin(16/period*(t - timesPlaying[10])) : 0)+
+             (notesPlaying[11] ? sin(32/period*(t - timesPlaying[11])) : 0)));
     if (prev != -1313131) {
       line(x - xspacing, prev, x, height / 2 + yvalue);
     }
@@ -143,11 +178,11 @@ void drawWave() {
 }
 
 void keyPressed() {
-  if (buttonToNumMap.containsKey("" + key)) {
-    int num = buttonToNumMap.get("" + key);
+  if (p1ButtonToNumMap.containsKey("" + key)) {
+    int num = p1ButtonToNumMap.get("" + key);
     
-    if (!currPlaying[num]) {
-      currPlaying[num] = true;
+    if (!p1CurrPlaying[num]) {
+      p1CurrPlaying[num] = true;
       
       String note = numToNoteMap.get(num);
       squares[num].play(map.get(note), .4);
@@ -156,18 +191,44 @@ void keyPressed() {
       p1EventNotes.add(note);
     }
   }
+  
+  if (p2ButtonToNumMap.containsKey("" + key)) {
+    int num = p2ButtonToNumMap.get("" + key);
+    
+    if (!p2CurrPlaying[num]) {
+      p2CurrPlaying[num] = true;
+      
+      String note = numToNoteMap.get(num);
+      sines[num].play(map.get(note), .4);
+      
+      p2EventTimes.add(millis());
+      p2EventNotes.add(note);
+    }
+  }
 }
 
 void keyReleased() {
-  if (buttonToNumMap.containsKey("" + key)) {
-    int num = buttonToNumMap.get("" + key);
+  if (p1ButtonToNumMap.containsKey("" + key)) {
+    int num = p1ButtonToNumMap.get("" + key);
     
-    currPlaying[num] = false;
+    p1CurrPlaying[num] = false;
     
     String note = numToNoteMap.get(num);
     squares[num].stop();
     
     p1EventTimes.add(millis());
     p1EventNotes.add(note);
+  }
+  
+  if (p2ButtonToNumMap.containsKey("" + key)) {
+    int num = p2ButtonToNumMap.get("" + key);
+    
+    p2CurrPlaying[num] = false;
+    
+    String note = numToNoteMap.get(num);
+    sines[num].stop();
+    
+    p2EventTimes.add(millis());
+    p2EventNotes.add(note);
   }
 }
