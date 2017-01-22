@@ -5,7 +5,7 @@ class FilePlayer {
   String[] lines;
   String songfile;
   SqrOsc[] squares;
-  SawOsc[] sines;
+  SinOsc[] sines;
   boolean[] currPlaying;
   int resetTime;
   float volume;
@@ -13,7 +13,7 @@ class FilePlayer {
   int octave;
   
   public FilePlayer() {
-    volume = .2;
+    volume = .4;
     loopTime = 0;
     octave = 0;
   }
@@ -24,7 +24,7 @@ class FilePlayer {
     octave = oc;
   }
   
-  void setSong(String filename,SqrOsc[] setSquares, SawOsc[] setSines) {
+  void setSong(String filename,SqrOsc[] setSquares, SinOsc[] setSines) {
     int loadMPB = 300;
     
     squares = setSquares;
@@ -86,6 +86,7 @@ class FilePlayer {
         }
       }else if(noteName.equals("fs")){
         if(currPlaying[1]){
+          println("stopped fs");
           squares[1].stop();
           //numPlaying--;
           currPlaying[1] = false;
@@ -94,6 +95,7 @@ class FilePlayer {
           }
           
         } else {
+          println("started fs");
           currPlaying[1] = true;
           //numPlaying += 1;
           squares[1].play(noteFreq, volume);
@@ -126,6 +128,7 @@ class FilePlayer {
         }
       }else if(noteName.equals("a")){
         if(currPlaying[3]){
+          println("stopped a");
           squares[3].stop();
           //numPlaying--;
           currPlaying[3] = false;
@@ -134,6 +137,7 @@ class FilePlayer {
           }
           
         } else {
+          println("started a");
           currPlaying[3] = true;
           //numPlaying += 1;
           
@@ -157,6 +161,7 @@ class FilePlayer {
         } else {
           currPlaying[4] = true;
           //numPlaying += 1;
+          println(squares[4]);
           squares[4].play(noteFreq, volume);
           //timesPressed[4] = millis();
           if(wave != null) {
@@ -189,7 +194,7 @@ class FilePlayer {
       
       eventIndex++;
     }
-    ////println("lt: " + loopTime);
+    //println("lt: " + loopTime);
     if(loopTime > 0 && millis() - resetTime > loopTime) {
       reset();
     }
