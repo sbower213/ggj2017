@@ -342,6 +342,10 @@ void drawUI() {
 }
 
 void drawKey(boolean active, int keyWidth) {
+  float offset = cos((float)(millis() - clickCtr) / millisPerBeat * 2 * PI) * .01;
+  //translate(-width * offset / 2, -height * offset / 2);
+  //scale(1.01 + offset);
+  
   colorMode(HSB);
   for (int j = 0; j < 6; j++) {
     if (active) {
@@ -352,7 +356,7 @@ void drawKey(boolean active, int keyWidth) {
       noFill();
     }
     
-    ellipse(keyWidth / 6.0 * j + keyWidth / 12.0, height - 30, 60, 60);
+    ellipse(keyWidth / 6.0 * j + keyWidth / 12.0, height - 30, 60 * (1 + offset), 60 * (1 + offset));
   }
 }
 
