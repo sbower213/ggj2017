@@ -81,9 +81,9 @@ class Wave {
                   
         stroke(hue, sat, 255);
         
-        line(x - xspacing, prev, x, height / 2 + yvalue);
+        line(x - xspacing, prev, x, yvalue);
       }
-      prev = height / 2 + yvalue;
+      prev = yvalue;
     }
   }
 
@@ -125,7 +125,26 @@ class Wave {
     return equal;
   }
   
-  void stopAll() {
+  void stopP2() {
+    int t = millis();
+    
+    boolean[] p2NotesPlaying = new boolean[squares.length];
+    for (int i = 0; i < p2EventTimes.size(); i++) {
+      if (p2EventTimes.get(i) > t)
+        break;
+      if (noteToNumMap.containsKey(p2EventNotes.get(i))) {
+        int indx = noteToNumMap.get(p2EventNotes.get(i));
+        p2NotesPlaying[indx] = !p2NotesPlaying[indx];
+      }
+    }
+    
+    for (int i = 0; i < p2NotesPlaying.length; i++) {
+      if (p2NotesPlaying[i])
+        p2PlayNote(numToNoteMap.get(i));
+    }
+  }
+  
+  void stopP1() {
     int t = millis();
     
     boolean[] p1NotesPlaying = new boolean[squares.length];
@@ -142,21 +161,11 @@ class Wave {
       if (p1NotesPlaying[i])
         p1PlayNote(numToNoteMap.get(i));
     }
-    
-    boolean[] p2NotesPlaying = new boolean[squares.length];
-    for (int i = 0; i < p2EventTimes.size(); i++) {
-      if (p2EventTimes.get(i) > t)
-        break;
-      if (noteToNumMap.containsKey(p2EventNotes.get(i))) {
-        int indx = noteToNumMap.get(p2EventNotes.get(i));
-        p2NotesPlaying[indx] = !p2NotesPlaying[indx];
-      }
-    }
-    
-    for (int i = 0; i < p2NotesPlaying.length; i++) {
-      if (p2NotesPlaying[i])
-        p2PlayNote(numToNoteMap.get(i));
-    }
+  }
+  
+  void stopAll() {
+    stopP1();
+    stopP2();
   }
 
   float p1Height(float t) {
@@ -211,9 +220,9 @@ class Wave {
     
     colorMode(RGB);
     stroke(255, 0, 0);
-    line(x, height/2 - oppHeight, x, height/2 + p1Height);
+    line(x, -oppHeight, x, p1Height);
     stroke(255);
-    ellipse(x, height / 2  - oppHeight, 16, 16);
+    ellipse(x, -oppHeight, 16, 16);
   }
   
   void p1PlayNote(String note) {

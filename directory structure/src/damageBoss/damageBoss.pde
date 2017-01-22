@@ -44,7 +44,7 @@ String[] riff1s = {"riff_1a.txt", "riff_2a.txt", "riff_3a.txt"};
 String[] riff2s = {"riff_1b.txt", "riff_2b.txt", "riff_3b.txt"};
 int curRiff;
 
-boolean started;
+boolean started, learning = false;
 PImage logo;
 
 boolean p1Active;
@@ -52,6 +52,7 @@ boolean p2Active;
 
 boolean over = false;
 boolean lost = false;
+boolean tutPhases = [false,false,false];
 
 float uiScale;
 float widthScale;
@@ -214,6 +215,10 @@ void startGame() {
 
   backgroundPlayer.reset();
   bassPlayer.reset();
+  
+  boss.x = width / 2;
+  boss.y = height / 3;
+  boss.r = 100;
 }
 
 void draw() {
@@ -230,11 +235,14 @@ void draw() {
     stroke(255, 255, 255, 255);
     // Fix for centering later?
     image(logo, 0, (height - width / 800.0 * 360) / 2, width, width / 800.0 * 360);
-    rect(300 * widthScale, 130 * uiScale, 200 * widthScale, 90  * uiScale);
-    fill(255, 255, 255, 255);
-    //    text("WAVE BATTLE", 400, 60);
-    text("START GAME", 400 * widthScale, 180 * uiScale);
 
+    rect(300 * widthScale,130 * uiScale,200 * widthScale,90  * uiScale);
+    rect(300 * widthScale, 230 * uiScale, 200 * widthScale, 90 * uiScale);
+    fill(255,255,255,255);
+//    text("WAVE BATTLE", 400, 60);
+    text("START GAME", 400 * widthScale, 180 * uiScale);
+    text("HOW TO PLAY", 400 * widthScale, 280 * uiScale);
+    
     if (over) {
       if (lost) {
         fill(255, 0, 0);
@@ -243,6 +251,8 @@ void draw() {
         fill(0, 255, 255);
         text("YOU WIN", 400 * widthScale, 60 * uiScale);
       }
+    } else if(learning) {
+      println("Learning at " + millis());
     }
   } else {
     if (millis() > clickCtr) {
@@ -256,13 +266,17 @@ void draw() {
 
 
     if (turn % 2 == 0) {
+      drawUI();
+      
       if (turn == 2) {
         scale(-1, 1);
         translate(-width, 0);
       }
+      translate(0, height * 2 / 3);
       playerWave.drawWave();
-
       playerWave.drawOpponent();
+      translate(0, -height * 2 / 3);
+      
       if (turn == 2) {
         translate(width, 0);
         scale(-1, 1);
@@ -309,8 +323,6 @@ void draw() {
         filePlayer2.setSong(riff2s[curRiff], squares, sines);
         curRiff++;
         curRiff %= riff1s.length;
-        println("riff: " + curRiff);
-
         if (turn == 0) {
           p1Active = false;
           p2Active = true;
@@ -361,18 +373,20 @@ void draw() {
          }*/
       }
     } else {
+      drawUI();
+      
+      translate(width/2, height / 2);
+      scale(-1, 1);
       bossWave1.drawWave();
       bossWave1.drawOpponent();
-
       translate(width, 0);
       scale(-1, 1);
+      
       bossWave2.drawWave();
       bossWave2.drawOpponent();
-      scale(-1, 1);
-      translate(-width, 0);
 
-      drawUI();
-
+      translate(-width/2, -height / 2);
+      
       boss.drawBoss();
 
 
@@ -387,9 +401,9 @@ void draw() {
           squares[i].stop();
         for (int i = 0; i < sines.length; i++)
           sines[i].stop();
-        bossWave1.stopAll();
-        bossWave2.stopAll();
-
+        bossWave1.stopP2();
+        bossWave2.stopP2();
+        
         switchedPlayers = true;
 
         filePlayer2.reset();
@@ -400,9 +414,9 @@ void draw() {
           squares[i].stop();
         for (int i = 0; i < sines.length; i++)
           sines[i].stop();
-        bossWave1.stopAll();
-        bossWave2.stopAll();
-
+        bossWave1.stopP2();
+        bossWave2.stopP2();
+        
         nextPhase = true;
         flashFrames = 4;
 
@@ -524,6 +538,12 @@ void mousePressed() {
 
     startGame();
   }
+  if(!started && mouseX <= 500 * widthScale && mouseX >= 300 * widthScale
+    && mouseY >= 230 && mouseY <= 320) {
+      learning = true;
+      
+      startTutorial();
+    }
 }
 
 void keyPressed() {
@@ -599,4 +619,8 @@ void keyReleased() {
     else
       bossWave2.p2PlayNote(note);
   }
+}
+
+void startTutorial(){
+  
 }
