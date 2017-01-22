@@ -161,6 +161,7 @@ void drawOpponent() {
 void drawWave() {
   noFill();
   stroke(255);
+  colorMode(HSB);
   
   int time = millis();
   
@@ -177,7 +178,32 @@ void drawWave() {
       }
     }
     
+    boolean[] p1NotesPlaying = new boolean[squares.length];
+    for (int i = 0; i < p1EventTimes.size(); i++) {
+      if (p1EventTimes.get(i) > t)
+        break;
+      if (noteToNumMap.containsKey(p1EventNotes.get(i))) {
+        int indx = noteToNumMap.get(p1EventNotes.get(i));
+        p1NotesPlaying[indx] = !p1NotesPlaying[indx];
+      }
+    }
+    
     if (prev != -1313131) {
+      int notes = 0;
+      for (int i = 0; i < 6; i++) {
+        notes += (p1NotesPlaying[i] ? 1 : 0);
+      }
+      
+      int hue = 0;
+      for (int i = 0; i < 6; i++) {
+        hue += (p1NotesPlaying[i] ? 1  : 0) * 42 * i;
+      }
+      if (notes > 0) hue /= notes;
+      
+      int sat = notes == 0 ? 0 : 255;
+                
+      stroke(hue, sat, 255);
+      
       line(x - xspacing, prev, x, height / 2 + yvalue);
     }
     prev = height / 2 + yvalue;
