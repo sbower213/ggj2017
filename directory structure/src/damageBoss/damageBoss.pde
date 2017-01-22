@@ -66,8 +66,8 @@ boolean delay;
 int delayStart;
 
 void setup() {
-  fullScreen();
-  //size(800, 360);
+  //fullScreen();
+  size(800, 360);
   background(255);
 
   uiScale = height / 360;
@@ -587,6 +587,7 @@ void mousePressed() {
 }
 
 void keyPressed() {
+  //println("pressed " + key);
 
   if (p1Active && p1ButtonToNumMap.containsKey("" + key)) {
     int num = p1ButtonToNumMap.get("" + key);
@@ -628,36 +629,43 @@ void keyPressed() {
 }
 
 void keyReleased() {
-  if (p1Active && p1ButtonToNumMap.containsKey("" + key)) {
+  //println("released " + key);
+  if (p1ButtonToNumMap.containsKey("" + key)) {
     int num = p1ButtonToNumMap.get("" + key);
-
-    p1CurrPlaying[num] = false;
-
-    String note = numToNoteMap.get(num);
-    squares[num].stop();
-
-    if (turn == 0)
-      playerWave.p1PlayNote(note);
-    else if (turn == 2)
-      playerWave.p2PlayNote(note);
-    else
-      bossWave1.p2PlayNote(note);
+    
+    if (p1Active || p1CurrPlaying[num]) {
+  
+      p1CurrPlaying[num] = false;
+  
+      String note = numToNoteMap.get(num);
+      squares[num].stop();
+  
+      if (turn == 0)
+        playerWave.p1PlayNote(note);
+      else if (turn == 2)
+        playerWave.p2PlayNote(note);
+      else
+        bossWave1.p2PlayNote(note);
+    }
   }
 
-  if (p2Active && p2ButtonToNumMap.containsKey("" + key)) {
+  if (p2ButtonToNumMap.containsKey("" + key)) {
     int num = p2ButtonToNumMap.get("" + key);
-
-    p2CurrPlaying[num] = false;
-
-    String note = numToNoteMap.get(num);
-    sines[num].stop();
-
-    if (turn == 2)
-      playerWave.p1PlayNote(note);
-    else if (turn == 0)
-      playerWave.p2PlayNote(note);
-    else
-      bossWave2.p2PlayNote(note);
+    
+    if (p2Active || p2CurrPlaying[num]) {
+  
+      p2CurrPlaying[num] = false;
+  
+      String note = numToNoteMap.get(num);
+      sines[num].stop();
+  
+      if (turn == 2)
+        playerWave.p1PlayNote(note);
+      else if (turn == 0)
+        playerWave.p2PlayNote(note);
+      else
+        bossWave2.p2PlayNote(note);
+    }
   }
 }
 
