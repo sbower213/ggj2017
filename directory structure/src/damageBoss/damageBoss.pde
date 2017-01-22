@@ -19,6 +19,9 @@ boolean[] p2CurrPlaying;
 int health;
 int turnStart;
 float damageCounter;
+float damageToBoss;
+float damageToPlayer;
+float runningPlayerDamage;
 int intervalNotesPlayed;
 int millisPerBeat = 400;
 int lastMillis;
@@ -231,7 +234,6 @@ void draw() {
     if(learning) {
       drawTutorial();
     } else {
-
       textSize(16 * uiScale);
       textAlign(CENTER);
       fill(255, 255, 255, 0);
@@ -309,6 +311,22 @@ void draw() {
         delay1Over = true;
         println("delay 1 over");
       }
+      
+      if (delay2Over) {
+        stroke(0, 0, 255);
+        for (int i = 0; i < damageToBoss / 10; i++) {
+          float t = (millis() - i * 100 - turnStart - millisPerBeat * barsPerTurn * 3) / (millisPerBeat * barsPerTurn * .4);
+          t = sqrt(t);
+          
+          if (t > 0 && t < 1) {
+            float x = (boss.x - width * 3.0 / 4) * t + width * 3.0 / 4;
+            float y = (boss.y - height * 2.0 / 3) * t + height * 2.0 / 3;
+            
+            line(x, y, x + 20 * uiScale, y);
+            line(x, y, x, y + 20 * uiScale);
+          }
+        }
+      }
 
       if (!switchedPlayers && millis() - turnStart > millisPerBeat * barsPerTurn * 2) {
         for (int i = 0; i < squares.length; i++)
@@ -355,6 +373,8 @@ void draw() {
         delayStart = millis();
         println("delay 2 start");
         
+        damageToBoss = damageCounter * (intervalNotesPlayed + 1) * .6;
+        
         damageBoss();
       }
       
@@ -373,11 +393,7 @@ void draw() {
          bossWave1.travelTime = 4 * barsPerTurn * millisPerBeat;
          }*/
       }
-    } else if(learning) {
-      
-      drawTutorial();
-      
-    }  else {
+    } else {
       drawUI();
       
       translate(width/2, height / 2);
@@ -393,6 +409,11 @@ void draw() {
       
       boss.drawBoss();
 
+      stroke(255, 0, 0);
+      for (int i = 0; i < runningPlayerDamage * 10; i++) {
+        line(width - abs(sin(i) * width / 4) * i, height - abs(cos(i) * height / 4) * i,
+          width - abs(sin(i + .14) * width / 4) * i, height - abs(cos(i + .17) * height / 4) * i);
+      }
 
       filePlayer1.playSong(bossWave1);
       if (switchedPlayers)
@@ -452,6 +473,7 @@ void draw() {
         delay2Over = false;
         p1Active = false;
         p2Active = false;
+        runningPlayerDamage = 0;
       }
     }
 
@@ -505,21 +527,26 @@ void damagePlayer() {
   float t = millis();
   float opp1Height = bossWave1.p2Height(t);
   float p1Height = bossWave1.p1Height(t - bossWave1.travelTime);
+  
+  damageToPlayer = 0;
 
   if (!bossWave1.matched(t - bossWave1.travelTime)) {
-    health -= max(abs(opp1Height - p1Height) / 20 - 2, 0) * 1.5;
+    damageToPlayer += max(abs(opp1Height - p1Height) / 20 - 2, 0) * 1.5;
   }
 
   float opp2Height = bossWave2.p2Height(t);
   float p2Height = bossWave2.p1Height(t - bossWave2.travelTime);
 
   if (!bossWave2.matched(t - bossWave2.travelTime)) {
-    health -= max(abs(opp2Height - p2Height) / 20 - 2, 0) * 1.5;
+    damageToPlayer += max(abs(opp2Height - p2Height) / 20 - 2, 0) * 1.5;
   }
+  
+  health -= damageToPlayer;
+  
+  runningPlayerDamage += damageToPlayer;
 }
 
 void damageBoss() {
-  float damageToBoss = damageCounter * (intervalNotesPlayed + 1) * .6;
   boss.damage(damageToBoss);
   intervalNotesPlayed = 0;
   damageCounter = 0;
