@@ -257,9 +257,9 @@ void draw() {
       }
       translate(0, height * 2 / 3);
       playerWave.drawWave();
+      playerWave.drawOpponent();
       translate(0, -height * 2 / 3);
       
-      playerWave.drawOpponent();
       if (turn == 2) {
         translate(width, 0);
         scale(-1, 1);
