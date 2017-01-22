@@ -13,22 +13,12 @@ HashMap<String, Integer> p2ButtonToNumMap;
 HashMap<Integer, String> numToNoteMap;
 HashMap<String, Integer> noteToNumMap;
 
-ArrayList<Integer> p1EventTimes;
-ArrayList<String> p1EventNotes;
-
-ArrayList<Integer> p2EventTimes;
-ArrayList<String> p2EventNotes;
-
 boolean[] p1CurrPlaying = {false, false, false, false, false, false};
 boolean[] p2CurrPlaying = {false, false, false, false, false, false};
 
-float amplitude = 75.0;
-float period = 300;
 int health = 1000;
-float dx;  // Value for incrementing X, a function of period and xspacing
-int xspacing = 2;   // How far apart should each horizontal location be spaced
-int w;              // Width of entire wave
-int travelTime = 2000;  //millis
+
+Wave wave;
 
 void setup() {
   size(800, 360);
@@ -44,14 +34,7 @@ void setup() {
     sines[i] = new SinOsc(this);
   }
   
-  w = 640+16;
-  dx = (TWO_PI / period) * xspacing;
-  
-  p1EventTimes = new ArrayList<Integer>();
-  p2EventTimes = new ArrayList<Integer>();
-  
-  p1EventNotes = new ArrayList<String>();
-  p2EventNotes = new ArrayList<String>();
+  wave = new Wave(75.0, 300, 2, 656, 2000);
   
   map = new HashMap<String,Float>();
   
@@ -120,9 +103,9 @@ void setup() {
 void draw() {
   background(0);
   
-  drawWave();
+  wave.drawWave();
   
-  drawOpponent();
+  wave.drawOpponent();
   
   drawUI();
 }
@@ -141,157 +124,6 @@ void drawUI() {
   }
 }
 
-void drawOpponent() {
-  float x = w * .75;
-  float t = millis();
-  float oppHeight = p2Height(t);
-  float p1Height = p1Height(t - travelTime);
-  
-  colorMode(RGB);
-  stroke(255, 0, 0);
-  line(x, height/2 - oppHeight, x, height/2 + p1Height);
-  stroke(255);
-  ellipse(x, height / 2  - oppHeight, 16, 16);
-  
-  if (!matched(t - travelTime)) {
-    health -= max(abs(oppHeight - p1Height) / 20 - 2, 0);
-  }
-}
-
-void drawWave() {
-  noFill();
-  stroke(255);
-  colorMode(HSB);
-  
-  int time = millis();
-  
-  float prev = -131313;
-  for (int x = 0; x < w; x += xspacing) {
-    float t = getTime(x, time);
-    
-    float yvalue = p1Height(t);
-    if (x > w * .75) {
-      if (matched(t)) {
-        yvalue = 0;
-      } else {
-        yvalue -= p2Height(t + travelTime);
-      }
-    }
-    
-    boolean[] p1NotesPlaying = new boolean[squares.length];
-    for (int i = 0; i < p1EventTimes.size(); i++) {
-      if (p1EventTimes.get(i) > t)
-        break;
-      if (noteToNumMap.containsKey(p1EventNotes.get(i))) {
-        int indx = noteToNumMap.get(p1EventNotes.get(i));
-        p1NotesPlaying[indx] = !p1NotesPlaying[indx];
-      }
-    }
-    
-    if (prev != -1313131) {
-      int notes = 0;
-      for (int i = 0; i < 6; i++) {
-        notes += (p1NotesPlaying[i] ? 1 : 0);
-      }
-      
-      int hue = 0;
-      for (int i = 0; i < 6; i++) {
-        hue += (p1NotesPlaying[i] ? 1  : 0) * 42 * i;
-      }
-      if (notes > 0) hue /= notes;
-      
-      int sat = notes == 0 ? 0 : 255;
-                
-      stroke(hue, sat, 255);
-      
-      line(x - xspacing, prev, x, height / 2 + yvalue);
-    }
-    prev = height / 2 + yvalue;
-  }
-}
-
-float getTime(float x) {
-  return getTime(x, millis());
-}
-
-float getTime(float x, float time) {
-  return time - (x * 4.0 / 3 / w * travelTime);
-}
-
-boolean matched(float t) {
-  boolean[] p1NotesPlaying = new boolean[squares.length];
-  for (int i = 0; i < p1EventTimes.size(); i++) {
-    if (p1EventTimes.get(i) > t)
-      break;
-    if (noteToNumMap.containsKey(p1EventNotes.get(i))) {
-      int indx = noteToNumMap.get(p1EventNotes.get(i));
-      p1NotesPlaying[indx] = !p1NotesPlaying[indx];
-    }
-  }
-  
-  boolean[] p2NotesPlaying = new boolean[squares.length];
-  for (int i = 0; i < p2EventTimes.size(); i++) {
-    if (p2EventTimes.get(i) > t + travelTime)
-      break;
-    if (noteToNumMap.containsKey(p2EventNotes.get(i))) {
-      int indx = noteToNumMap.get(p2EventNotes.get(i));
-      p2NotesPlaying[indx] = !p2NotesPlaying[indx];
-    }
-  }
-  
-  boolean equal = true;
-  for (int i = 0;  i < squares.length; i++) {
-    equal = (p1NotesPlaying[i] == p2NotesPlaying[i]);
-    if (!equal)
-      break;
-  }
-  return equal;
-}
-
-float p1Height(float t) {
-  boolean[] notesPlaying = new boolean[squares.length];
-  int[] timesPlaying = new int[squares.length];
-  for (int i = 0; i < p1EventTimes.size(); i++) {
-    if (p1EventTimes.get(i) > t)
-      break;
-    if (noteToNumMap.containsKey(p1EventNotes.get(i))) {
-      int indx = noteToNumMap.get(p1EventNotes.get(i));
-      notesPlaying[indx] = !notesPlaying[indx];
-      timesPlaying[indx] = p1EventTimes.get(i);
-    }
-  }
-  
-  return amplitude *
-     ((notesPlaying[0] ? sin(1/period*(t - timesPlaying[0])) : 0)+
-       (notesPlaying[1] ? sin(2/period*(t - timesPlaying[1])) : 0)+
-        (notesPlaying[2] ? sin(4/period*(t - timesPlaying[2])) : 0)+
-         (notesPlaying[3] ? sin(8/period*(t - timesPlaying[3])) : 0)+
-          (notesPlaying[4] ? sin(16/period*(t - timesPlaying[4])) : 0)+
-           (notesPlaying[5] ? sin(32/period*(t - timesPlaying[5])) : 0));
-}
-
-float p2Height(float t) {
-  boolean[] notesPlaying = new boolean[squares.length];
-  int[] timesPlaying = new int[squares.length];
-  for (int i = 0; i < p2EventTimes.size(); i++) {
-    if (p2EventTimes.get(i) > t)
-      break;
-    if (noteToNumMap.containsKey(p2EventNotes.get(i))) {
-      int indx = noteToNumMap.get(p2EventNotes.get(i));
-      notesPlaying[indx] = !notesPlaying[indx];
-      timesPlaying[indx] = p2EventTimes.get(i);
-    }
-  }
-  
-  return amplitude *
-     ((notesPlaying[0] ? sin(1/period*(t - timesPlaying[0])) : 0)+
-       (notesPlaying[1] ? sin(2/period*(t - timesPlaying[1])) : 0)+
-        (notesPlaying[2] ? sin(4/period*(t - timesPlaying[2])) : 0)+
-         (notesPlaying[3] ? sin(8/period*(t - timesPlaying[3])) : 0)+
-          (notesPlaying[4] ? sin(16/period*(t - timesPlaying[4])) : 0)+
-           (notesPlaying[5] ? sin(32/period*(t - timesPlaying[5])) : 0));
-}
-
 void keyPressed() {
   if (p1ButtonToNumMap.containsKey("" + key)) {
     int num = p1ButtonToNumMap.get("" + key);
@@ -302,8 +134,7 @@ void keyPressed() {
       String note = numToNoteMap.get(num);
       squares[num].play(map.get(note), .4);
       
-      p1EventTimes.add(millis());
-      p1EventNotes.add(note);
+      wave.p1PlayNote(note);
     }
   }
   
@@ -316,8 +147,7 @@ void keyPressed() {
       String note = numToNoteMap.get(num);
       sines[num].play(map.get(note), .4);
       
-      p2EventTimes.add(millis());
-      p2EventNotes.add(note);
+      wave.p2PlayNote(note);
     }
   }
 }
@@ -330,9 +160,8 @@ void keyReleased() {
     
     String note = numToNoteMap.get(num);
     squares[num].stop();
-    
-    p1EventTimes.add(millis());
-    p1EventNotes.add(note);
+      
+    wave.p1PlayNote(note);
   }
   
   if (p2ButtonToNumMap.containsKey("" + key)) {
@@ -342,8 +171,7 @@ void keyReleased() {
     
     String note = numToNoteMap.get(num);
     sines[num].stop();
-    
-    p2EventTimes.add(millis());
-    p2EventNotes.add(note);
+      
+    wave.p2PlayNote(note);
   }
 }
