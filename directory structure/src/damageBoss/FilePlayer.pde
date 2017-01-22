@@ -5,7 +5,7 @@ class FilePlayer {
   String[] lines;
   String songfile;
   SqrOsc[] squares;
-  SinOsc[] sines;
+  SawOsc[] sines;
   boolean[] currPlaying;
   int resetTime;
   float volume;
@@ -13,7 +13,7 @@ class FilePlayer {
   int octave;
   
   public FilePlayer() {
-    volume = .4;
+    volume = .2;
     loopTime = 0;
     octave = 0;
   }
@@ -24,7 +24,7 @@ class FilePlayer {
     octave = oc;
   }
   
-  void setSong(String filename,SqrOsc[] setSquares, SinOsc[] setSines) {
+  void setSong(String filename,SqrOsc[] setSquares, SawOsc[] setSines) {
     int loadMPB = 300;
     
     squares = setSquares;

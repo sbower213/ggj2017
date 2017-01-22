@@ -5,7 +5,7 @@ import java.util.Map;
 
 SqrOsc[] squares;
 
-SinOsc[] sines;
+SawOsc[] sines;
 
 HashMap<String, Float> map;
 HashMap<String, Integer> p1ButtonToNumMap;
@@ -63,8 +63,8 @@ boolean delay;
 int delayStart;
 
 void setup() {
-  //fullScreen();
-  size(800, 360);
+  fullScreen();
+  //size(800, 360);
   background(255);
 
   uiScale = height / 360;
@@ -77,9 +77,9 @@ void setup() {
     squares[i] = new SqrOsc(this);
   }
 
-  sines = new SinOsc[6];
+  sines = new SawOsc[6];
   for (int i = 0; i <  sines.length; i++) {
-    sines[i] = new SinOsc(this);
+    sines[i] = new SawOsc(this);
   }
 
   filePlayer1 = new FilePlayer();
@@ -160,11 +160,11 @@ void setup() {
     bassSquares[i] = new SqrOsc(this);
   }
 
-  SinOsc[] bassSines = new SinOsc[6];
+  SawOsc[] bassSines = new SawOsc[6];
   for (int i = 0; i <  sines.length; i++) {
-    bassSines[i] = new SinOsc(this);
+    bassSines[i] = new SawOsc(this);
   }
-  bassPlayer = new FilePlayer(.2, 4 * millisPerBeat * 8, -1);
+  bassPlayer = new FilePlayer(.1, 4 * millisPerBeat * 8, -1);
   bassPlayer.setSong("song2_reformatted.txt", bassSquares, bassSines);
 
 
@@ -173,11 +173,11 @@ void setup() {
     backSquares[i] = new SqrOsc(this);
   }
 
-  SinOsc[] backSines = new SinOsc[6];
+  SawOsc[] backSines = new SawOsc[6];
   for (int i = 0; i <  sines.length; i++) {
-    backSines[i] = new SinOsc(this);
+    backSines[i] = new SawOsc(this);
   }
-  backgroundPlayer = new FilePlayer(.2, 4 * millisPerBeat * 8, 0);
+  backgroundPlayer = new FilePlayer(.1, 4 * millisPerBeat * 8, 0);
   backgroundPlayer.setSong("song_reformatted.txt", backSquares, backSines);
 }
 
@@ -453,10 +453,14 @@ void draw() {
       over = true;
       lost = true;
       started = false;
+      backgroundPlayer.reset();
+      bassPlayer.reset();
     } else if (boss.health < 0) {
       over = true;
       lost = false;
       started = false;
+      backgroundPlayer.reset();
+      bassPlayer.reset();
     }
   }
 }
@@ -556,7 +560,7 @@ void keyPressed() {
       p1CurrPlaying[num] = true;
 
       String note = numToNoteMap.get(num);
-      squares[num].play(map.get(note), .4);
+      squares[num].play(map.get(note), .2);
 
       intervalNotesPlayed += 1;
 
