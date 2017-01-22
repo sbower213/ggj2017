@@ -394,6 +394,15 @@ void draw() {
          }*/
       }
     } else {
+      stroke(255, 0, 0);
+      for (int i = 0; i < runningPlayerDamage * 1 / 3; i++) {
+        line(width - abs(sin(i) * width / 4) * min(i, 4), height - abs(cos(i) * height / 4) * min(i, 4),
+          width - abs(sin(i + .14) * width / 4) * min(i, 4), height - abs(cos(i + .17) * height / 4) * min(i, 4));
+          
+        line(abs(sin(i) * width / 4) * min(i, 4), height - abs(cos(i) * height / 4) * min(i, 4),
+          abs(sin(i + .14) * width / 4) * min(i, 4), height - abs(cos(i + .17) * height / 4) * min(i, 4));
+      }
+      
       drawUI();
       
       translate(width/2, height / 2);
@@ -408,12 +417,6 @@ void draw() {
       translate(-width/2, -height / 2);
       
       boss.drawBoss();
-
-      stroke(255, 0, 0);
-      for (int i = 0; i < runningPlayerDamage * 10; i++) {
-        line(width - abs(sin(i) * width / 4) * i, height - abs(cos(i) * height / 4) * i,
-          width - abs(sin(i + .14) * width / 4) * i, height - abs(cos(i + .17) * height / 4) * i);
-      }
 
       filePlayer1.playSong(bossWave1);
       if (switchedPlayers)
