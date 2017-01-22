@@ -13,13 +13,13 @@ HashMap<String, Integer> p2ButtonToNumMap;
 HashMap<Integer, String> numToNoteMap;
 HashMap<String, Integer> noteToNumMap;
 
-boolean[] p1CurrPlaying = {false, false, false, false, false, false};
-boolean[] p2CurrPlaying = {false, false, false, false, false, false};
+boolean[] p1CurrPlaying;
+boolean[] p2CurrPlaying;
 
-int health = 1000;
-int turnStart = 0;
-float damageCounter = 0;
-int intervalNotesPlayed = 0;
+int health;
+int turnStart;
+float damageCounter;
+int intervalNotesPlayed;
 int millisPerBeat = 400;
 int lastMillis;
 float delta;
@@ -29,12 +29,12 @@ Boss boss;
 Wave bossWave1, bossWave2;
 FilePlayer filePlayer1, filePlayer2;
 
-int turn = 0;
+int turn;
 int barsPerTurn = 4;
-boolean switchedPlayers = false;
-boolean nextPhase = false;
+boolean switchedPlayers;
+boolean nextPhase;
 
-int flashFrames = 0;
+int flashFrames;
 
 SoundFile[] clicks;
 int clickCtr;
@@ -47,8 +47,11 @@ int curRiff;
 boolean started;
 PImage logo;
 
-boolean p1Active = true;
-boolean p2Active = false;
+boolean p1Active;
+boolean p2Active;
+
+boolean over = false;
+boolean lost = false;
 
 void setup() {
   size(800, 360);
@@ -66,18 +69,11 @@ void setup() {
     sines[i] = new SinOsc(this);
   }
   
-  playerWave = new Wave(75.0, 300, 2, width, 2 * barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
-  bossWave1 = new Wave(75.0, 300, 2, width / 2, 2 * barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
-  bossWave2 = new Wave(75.0, 300, 2, width / 2, 2 * barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
-  
   filePlayer1 = new FilePlayer();
   filePlayer2 = new FilePlayer();
   
-  boss = new Boss();
-  
   clicks = new SoundFile[]{new SoundFile(this, "mid.mp3"), new SoundFile(this, "hi.mp3"), 
             new SoundFile(this, "mid.mp3"), new SoundFile(this, "lo.mp3")};
-  clickCtr = 0;
   
   map = new HashMap<String,Float>();
   
@@ -145,6 +141,35 @@ void setup() {
   lastMillis = millis();
 }
 
+void startGame() {
+  health = 1000;
+  turnStart = 0;
+  damageCounter = 0;
+  intervalNotesPlayed = 0;
+  
+  p1Active = true;
+  p2Active = false;
+  
+  curRiff = 0;
+  clickCtr = 0;
+  
+  flashFrames = 0;
+  turn = 0;
+  switchedPlayers = false;
+  nextPhase = false;
+  
+  turnStart = millis();
+  clickCtr = millis();
+  
+  playerWave = new Wave(75.0, 300, 2, width, 2 * barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
+  bossWave1 = new Wave(75.0, 300, 2, width / 2, 2 * barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
+  bossWave2 = new Wave(75.0, 300, 2, width / 2, 2 * barsPerTurn * millisPerBeat);   //4/4 so * 4, but / 2
+  boss = new Boss();
+  
+  p1CurrPlaying = new boolean[6];
+  p2CurrPlaying = new boolean[6];
+}
+
 void draw() {
   background(0);
   delta = (millis() - lastMillis) / 1000.0;
@@ -162,6 +187,16 @@ void draw() {
     fill(255,255,255,255);
 //    text("WAVE BATTLE", 400, 60);
     text("START GAME", 400, 180);
+    
+    if (over) {
+      if (lost) {
+        fill(255, 0, 0);
+        text("YOU LOSE", 400, 60);
+      } else {
+        fill(0, 255, 255);
+        text("YOU WIN", 400, 60);
+      }
+    }
   } else {
     if(millis() > clickCtr){
       clicks[nextClick].play();
@@ -325,6 +360,16 @@ void draw() {
         }
       }
     }
+    
+    if (health < 0) {
+      over = true;
+      lost = true;
+      started = false;
+    } else if (boss.health < 0) {
+      over = true;
+      lost = false;
+      started = false;
+    }
   }
 }
 
@@ -400,11 +445,11 @@ void countBossDamage() {
 
 void mousePressed() {
   
-  if(mouseX <= 500 && mouseX >= 300 && mouseY <= 210 && mouseY <= 210 && mouseY >= 120) {
+  if(!started && mouseX <= 500 && mouseX >= 300 && mouseY <= 210 && mouseY <= 210 && mouseY >= 120) {
     // Enter start game conditions here.
     started = true;
-    turnStart = millis();
-    clickCtr = millis();
+    
+    startGame();
   }
 }
 
