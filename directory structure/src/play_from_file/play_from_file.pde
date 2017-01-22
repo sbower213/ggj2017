@@ -17,6 +17,9 @@ SinOsc sinR;
 SinOsc sinT;
 SinOsc sinY;
 
+SoundFile click;
+int clickCtr;
+
 HashMap<String,Float> map;
 int[] eventTimes;
 String[] eventNotes;
@@ -64,6 +67,10 @@ void setup() {
   sinT = new SinOsc(this);
   sinY = new SinOsc(this);
   
+  click = new SoundFile(this, "click.mp3");
+  println(click);
+  clickCtr = 0;
+  
   w = 640+16;
   dx = (TWO_PI / period) * xspacing;
   yvalues = new float[w/xspacing];
@@ -95,6 +102,11 @@ void draw() {
   
   //println("Mill: "+ millis());
   //println("Next Event: "+eventTimes[eventIndex]);
+  if(millis() > clickCtr){
+    click.play();
+    clickCtr += 300;
+  }
+  
   while(eventIndex < eventTimes.length && millis() >= eventTimes[eventIndex]){
     String noteName = eventNotes[eventIndex];
     float noteFreq = map.get(noteName);
@@ -464,4 +476,24 @@ void keyReleased(){
     sinY.stop();
     currIntercepting[5] = false;
   }
+}
+
+class Player{
+
+  float health;
+  boolean on_atk;
+  
+  
+
+}
+
+class Game{
+
+  Player[] players;
+  Player current; //whoever is sending notes (on the atk)
+  
+  Game(){
+    
+  }
+
 }
