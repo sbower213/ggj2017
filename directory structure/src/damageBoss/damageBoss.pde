@@ -54,6 +54,7 @@ boolean over = false;
 boolean lost = false;
 
 float uiScale;
+float widthScale;
 
 void setup() {
   fullScreen();
@@ -61,6 +62,7 @@ void setup() {
   background(255);
   
   uiScale = height / 360;
+  widthScale = width / 800.0;
   
   logo = loadImage("logo.png");
   
@@ -182,7 +184,6 @@ void draw() {
     
     
   if (!started) {
-    float widthScale = width / 800.0;
     
     textSize(16 * uiScale);
     textAlign(CENTER);
@@ -452,7 +453,8 @@ void countBossDamage() {
 
 void mousePressed() {
   
-  if(!started && mouseX <= 500 && mouseX >= 300 && mouseY <= 210 && mouseY <= 210 && mouseY >= 120) {
+  if(!started && mouseX <= 500 * widthScale && mouseX >= 300 * widthScale
+    && mouseY <= 210 * uiScale && mouseY >= 120 * uiScale) {
     // Enter start game conditions here.
     started = true;
     
