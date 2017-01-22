@@ -230,7 +230,6 @@ void draw() {
         damageBoss();
         turn ++;
         turn %= 4;
-        println("turn: " + turn);
         turnStart = millis();
         switchedPlayers = false;
         filePlayer1.reset();
