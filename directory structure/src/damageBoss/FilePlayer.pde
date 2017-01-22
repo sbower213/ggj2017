@@ -50,14 +50,20 @@ class FilePlayer {
           squares[0].stop();
           //numPlaying--;
           currPlaying[0] = false;
-          wave.p1PlayNote("e");
+          if(wave != null) {
+            wave.p1PlayNote("e");
+          }
+          
         } else {
           currPlaying[0] = true;
           //numPlaying += 1;
           squares[0].play(noteFreq, .4);
           //timesPressed[0] = millis();
-          wave.p1PlayNote("e");
+          if(wave != null) {
+            wave.p1PlayNote("e");
           //wave.p2PlayNote("e");
+          }
+          
         }
       }else if(noteName.equals("fs")){
         if(currPlaying[1]){
@@ -65,14 +71,20 @@ class FilePlayer {
           squares[1].stop();
           //numPlaying--;
           currPlaying[1] = false;
-          wave.p1PlayNote("fs");
+          if(wave != null) {
+            wave.p1PlayNote("fs");
+          }
+          
         } else {
           println("started fs");
           currPlaying[1] = true;
           //numPlaying += 1;
           squares[1].play(noteFreq, .4);
           //timesPressed[1] = millis();
-          wave.p1PlayNote("fs");
+          if(wave != null) {
+            wave.p1PlayNote("fs");
+          }
+          
           //wave.p2PlayNote("fs");
         }
       }else if(noteName.equals("gs")){
@@ -80,13 +92,19 @@ class FilePlayer {
           squares[2].stop();
           //numPlaying--;
           currPlaying[2] = false;
-          wave.p1PlayNote("gs");
+          if(wave != null) {
+            wave.p1PlayNote("gs");
+          }
+          
         } else {
           currPlaying[2] = true;
           //numPlaying += 1;
           squares[2].play(noteFreq, .4);
           //timesPressed[2] = millis();
-          wave.p1PlayNote("gs");
+          if(wave != null) {
+            wave.p1PlayNote("gs");
+          }
+          
           //wave.p2PlayNote("gs");
         }
       }else if(noteName.equals("a")){
@@ -95,14 +113,21 @@ class FilePlayer {
           squares[3].stop();
           //numPlaying--;
           currPlaying[3] = false;
-          wave.p1PlayNote("a");
+          if(wave != null) {
+            wave.p1PlayNote("a");
+          }
+          
         } else {
           println("started a");
           currPlaying[3] = true;
           //numPlaying += 1;
+          
           squares[3].play(noteFreq, .4);
           //timesPressed[3] = millis();
-          wave.p1PlayNote("a");
+          if(wave != null) {
+            wave.p1PlayNote("a");
+          }
+          
           //wave.p2PlayNote("a");
         }
       }else if(noteName.equals("b")){
@@ -110,13 +135,20 @@ class FilePlayer {
           squares[4].stop();
           //numPlaying--;
           currPlaying[4] = false;
-          wave.p1PlayNote("b");
+          if(wave != null) {
+            wave.p1PlayNote("b");
+          }
+          
         } else {
           currPlaying[4] = true;
           //numPlaying += 1;
+          println(squares[4]);
           squares[4].play(noteFreq, .4);
           //timesPressed[4] = millis();
-          wave.p1PlayNote("b");
+          if(wave != null) {
+            wave.p1PlayNote("b");
+          }
+          
           //wave.p2PlayNote("b");
         }
       }else if(noteName.equals("cs")){
@@ -124,18 +156,27 @@ class FilePlayer {
           squares[5].stop();
           //numPlaying--;
           currPlaying[5] = false;
-          wave.p1PlayNote("cs");
+          if(wave != null) {
+            wave.p1PlayNote("cs");
+          }
+          
         } else {
           currPlaying[5] = true;
           //numPlaying += 1;
           squares[5].play(noteFreq, .4);
           //timesPressed[5] = millis();
-          wave.p1PlayNote("cs");
+          if(wave != null) {
+            wave.p1PlayNote("cs");
+          }
+          
           //wave.p2PlayNote("cs");
         }
       }
       
       eventIndex++;
+      if(wave == null && eventIndex >= eventTimes.length) {
+        reset();
+      }
     }
   }
 }

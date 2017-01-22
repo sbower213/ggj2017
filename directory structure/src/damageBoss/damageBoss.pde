@@ -27,7 +27,7 @@ float delta;
 Wave playerWave;
 Boss boss;
 Wave bossWave1, bossWave2;
-FilePlayer filePlayer1, filePlayer2;
+FilePlayer filePlayer1, filePlayer2,backgroundPlayer;
 
 int turn;
 int barsPerTurn = 4;
@@ -146,6 +146,18 @@ void setup() {
   p2ButtonToNumMap.put(":", 5); //y
   
   lastMillis = millis();
+  // Background player code
+  SqrOsc[] backSquares = new SqrOsc[6];
+  for (int i = 0; i < squares.length; i++) {
+    backSquares[i] = new SqrOsc(this);
+  }
+  
+  SinOsc[] backSines = new SinOsc[6];
+  for (int i = 0; i <  sines.length; i++) {
+    backSines[i] = new SinOsc(this);
+  }
+  backgroundPlayer = new FilePlayer();
+  backgroundPlayer.setSong("song2_reformatted.txt",backSquares,backSines);
 }
 
 void startGame() {
@@ -179,6 +191,7 @@ void startGame() {
 
 void draw() {
   background(0);
+  backgroundPlayer.playSong(null);
   delta = (millis() - lastMillis) / 1000.0;
   lastMillis = millis();
     
@@ -303,6 +316,7 @@ void draw() {
       drawUI();
       
       boss.drawBoss();
+
       
       filePlayer1.playSong(bossWave1);
       if (switchedPlayers)
