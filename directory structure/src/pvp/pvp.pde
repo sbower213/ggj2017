@@ -16,7 +16,10 @@ SinOsc sinR;
 SinOsc sinT;
 SinOsc sinY;
 
+int noDamageCounter = 0;
+int intervalNotesPlayed = 0;
 int numPlaying = 0;
+int bossInterval = 0;
 boolean[] currPlaying = {false, false, false, false, false, false};
 boolean[] currIntercepting = {false, false, false, false, false, false};
 
@@ -91,10 +94,17 @@ void draw() {
   int i = yvalues.length - yValHead - 1 - (int)(yvalues.length * .25);
   if (i < 0) i += yvalues.length;
   
-  println("currNotes: " + currNotes);
-  if (currNotes != notesAtTime[i])
+  //println("currNotes: " + currNotes);
+  // Conditional to check when the "defending player" may take damage from the incoming waves
+  if (currNotes != notesAtTime[i]) {
     health -= max(abs(oppY[0] - yvalues[i]) / 20 - 2, 0);
-  
+    //println("damage?");
+    noDamageCounter -= 1;
+  // Conditional for when "Defending" player matches notes given by incoming waves
+  } else if (currNotes != 0 && currNotes == notesAtTime[i]) {
+    //println("no damage?");
+    noDamageCounter += 1;
+  }
   colorMode(RGB);
   stroke(255, 0, 0);
   
@@ -125,6 +135,7 @@ void draw() {
     
     ellipse(width / 6.0 * j + width / 12.0, height - 30, 60, 60);
   }
+  countBossDamage();
 }
 
 
@@ -199,6 +210,7 @@ void keyPressed() {
       squareQ.play(262, .4);
      
       timesPressed[0] = millis();
+      intervalNotesPlayed += 1;
     }
   } else if(key == 'w' || key == 'W') {
     if(!currPlaying[1]){
@@ -207,6 +219,7 @@ void keyPressed() {
       squareW.play(294, .4);
       
       timesPressed[1] = millis();
+      intervalNotesPlayed += 1;
     }
   } else if(key == 'e' || key == 'E') {
     if(!currPlaying[2]){
@@ -215,6 +228,7 @@ void keyPressed() {
       squareE.play(330, .4);
       
       timesPressed[2] = millis();
+      intervalNotesPlayed += 1;
     }
   } else if(key == 'r' || key == 'R') {
     if(!currPlaying[3]){
@@ -223,6 +237,7 @@ void keyPressed() {
       squareR.play(392, .4);
       
       timesPressed[3] = millis();
+      intervalNotesPlayed += 1;
     }
   } else if(key == 't' || key == 'T') {
     if(!currPlaying[4]){
@@ -231,6 +246,7 @@ void keyPressed() {
       squareT.play(440, .4);
       
       timesPressed[4] = millis();
+      intervalNotesPlayed += 1;
     }
   } else if(key == 'y' || key == 'Y') {
     if(!currPlaying[5]){
@@ -239,6 +255,7 @@ void keyPressed() {
       squareY.play(523, .4);
       
       timesPressed[5] = millis();
+      intervalNotesPlayed += 1;
     }
   }
   
@@ -344,5 +361,17 @@ void keyReleased(){
     numPlaying -= 1;
     sinY.stop();
     currIntercepting[5] = false;
+  }
+}
+
+void countBossDamage() {
+  bossInterval += 1;
+  if(bossInterval == 1000) {
+    bossInterval = 0;
+    int damageToBoss = (noDamageCounter/100) + (intervalNotesPlayed * 1);
+    println("Negative Damage: "+noDamageCounter);
+    println("Number of notes stacked: " + intervalNotesPlayed);
+    println("Damage to Boss: " + damageToBoss);
+    println("********************************************************************");
   }
 }
