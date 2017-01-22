@@ -42,7 +42,7 @@ class Wave {
     
     int time = millis();
     
-    float prev = -131313;
+    float prev = 0;
     for (int x = 0; x < w; x += xspacing) {
       float t = getTime(x, time);
       
@@ -65,7 +65,7 @@ class Wave {
         }
       }
       
-      if (prev != -1313131) {
+      if (x > 0) {
         int notes = 0;
         for (int i = 0; i < 6; i++) {
           notes += (p1NotesPlaying[i] ? 1 : 0);

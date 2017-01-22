@@ -7,7 +7,7 @@ class Boss {
     colorMode(RGB);
     stroke(255);
     fill(0,0,255);
-    rect(0, 20, health / 500.0 * width,20);
+    rect(0, uiScale * 20, health / 500.0 * width,uiScale * 20);
   }
   
   void damage(float d) {

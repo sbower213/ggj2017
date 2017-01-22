@@ -53,9 +53,14 @@ boolean p2Active;
 boolean over = false;
 boolean lost = false;
 
+float uiScale;
+
 void setup() {
-  size(800, 360);
+  fullScreen();
+//  size(800, 360);
   background(255);
+  
+  uiScale = height / 360;
   
   logo = loadImage("logo.png");
   
@@ -177,24 +182,26 @@ void draw() {
     
     
   if (!started) {
-    textSize(16);
+    float widthScale = width / 800.0;
+    
+    textSize(16 * uiScale);
     textAlign(CENTER);
     fill(255,255,255,0);
     stroke(255,255,255,255);
     // Fix for centering later?
-    image(logo, 0, 0, width, height);
-    rect(300,130,200,90);
+    image(logo, 0, (height - width / 800.0 * 360) / 2, width, width / 800.0 * 360);
+    rect(300 * widthScale,130 * uiScale,200 * widthScale,90  * uiScale);
     fill(255,255,255,255);
 //    text("WAVE BATTLE", 400, 60);
-    text("START GAME", 400, 180);
+    text("START GAME", 400 * widthScale, 180 * uiScale);
     
     if (over) {
       if (lost) {
         fill(255, 0, 0);
-        text("YOU LOSE", 400, 60);
+        text("YOU LOSE", 400 * widthScale, 60 * uiScale);
       } else {
         fill(0, 255, 255);
-        text("YOU WIN", 400, 60);
+        text("YOU WIN", 400 * widthScale, 60 * uiScale);
       }
     }
   } else {
@@ -375,7 +382,7 @@ void draw() {
 
 void drawUI() {
   fill(255,0,0);
-  rect(0, 0, health / 1000.0 * width,20);
+  rect(0, 0, health / 1000.0 * width, uiScale * 20);
   
   int keyWidth = (int)(width * .4);
   drawKey(p1Active, keyWidth);
@@ -400,7 +407,7 @@ void drawKey(boolean active, int keyWidth) {
       noFill();
     }
     
-    ellipse(keyWidth / 6.0 * j + keyWidth / 12.0, height - 30, 60 * (1 + offset), 60 * (1 + offset));
+    ellipse(keyWidth / 6.0 * j + keyWidth / 12.0, height - 30 * uiScale, uiScale * 60 * (1 + offset), uiScale * 60 * (1 + offset));
   }
 }
 
