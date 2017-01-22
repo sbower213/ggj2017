@@ -215,6 +215,8 @@ void draw() {
     
     boss.playSong(bossWave1, bossWave2);
     
+    damagePlayer();
+    
     if(millis() - turnStart > millisPerBeat * barsPerTurn * 4) {
       bossWave1.reset();
       bossWave2.reset();
@@ -236,6 +238,23 @@ void drawUI() {
     noStroke();
     
     ellipse(width / 6.0 * j + width / 12.0, height - 30, 60, 60);
+  }
+}
+
+void damagePlayer() {
+  float t = millis();
+  float opp1Height = bossWave1.p2Height(t);
+  float p1Height = bossWave1.p1Height(t - bossWave1.travelTime);
+  
+  if (!bossWave1.matched(t - bossWave1.travelTime)) {
+    health -= max(abs(opp1Height - p1Height) / 20 - 2, 0);
+  }
+  
+  float opp2Height = bossWave2.p2Height(t);
+  float p2Height = bossWave2.p1Height(t - bossWave2.travelTime);
+  
+  if (!bossWave2.matched(t - bossWave2.travelTime)) {
+    health -= max(abs(opp2Height - p2Height) / 20 - 2, 0);
   }
 }
 
