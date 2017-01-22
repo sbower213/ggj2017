@@ -30,7 +30,7 @@ float delta;
 Wave playerWave;
 Boss boss;
 Wave bossWave1, bossWave2;
-FilePlayer filePlayer1, filePlayer2, bassPlayer, backgroundPlayer;
+FilePlayer filePlayer1, filePlayer2, bassPlayer, backgroundPlayer, jinglePlayer;
 
 int turn;
 int barsPerTurn = 8;
@@ -182,6 +182,8 @@ void setup() {
   }
   backgroundPlayer = new FilePlayer(.1, 4 * millisPerBeat * 8, 0);
   backgroundPlayer.setSong("song_reformatted.txt", backSquares, backSines);
+  
+  jinglePlayer = new FilePlayer(.1, 0, 0);
 }
 
 void startGame() {
@@ -252,9 +254,12 @@ void draw() {
         if (lost) {
           fill(255, 0, 0);
           text("YOU LOSE", 400 * widthScale, 60 * uiScale);
+          jinglePlayer.playSong(null);
+          
         } else {
           fill(0, 255, 255);
           text("YOU WIN", 400 * widthScale, 60 * uiScale);
+          jinglePlayer.playSong(null);
         }
       }
     }
@@ -486,12 +491,16 @@ void draw() {
       started = false;
       backgroundPlayer.reset();
       bassPlayer.reset();
+      jinglePlayer.setSong("loss.txt", backgroundPlayer.squares, backgroundPlayer.sines);
+      jinglePlayer.reset();
     } else if (boss.health < 0) {
       over = true;
       lost = false;
       started = false;
       backgroundPlayer.reset();
       bassPlayer.reset();
+      jinglePlayer.setSong("win.txt", backgroundPlayer.squares, backgroundPlayer.sines);
+      jinglePlayer.reset();
     }
   }
 }
