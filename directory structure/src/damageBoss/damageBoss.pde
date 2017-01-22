@@ -146,15 +146,16 @@ void countBossDamage() {
   float p1Height = wave.p1Height(t - wave.travelTime);
   
   if (wave.matched(t - wave.travelTime)) {
-    damageCounter += abs(oppHeight - p1Height) * delta;
+    damageCounter += abs(oppHeight) * delta;
   }
   
-  if(millis() - bossInterval > millisPerBeat * 4) {
+  if(millis() - bossInterval > millisPerBeat * 16) {
     bossInterval = millis();
     println("counter: " + damageCounter);
-    println("log: " + log(intervalNotesPlayed + 2));
-    float damageToBoss = damageCounter * log(intervalNotesPlayed + 2);
+    println("modifier: " + (intervalNotesPlayed + 1));
+    float damageToBoss = damageCounter * (intervalNotesPlayed + 1);
     boss.damage(damageToBoss);
+    intervalNotesPlayed = 0;
     damageCounter = 0;
     println("Negative Damage: " + damageCounter);
     println("Number of notes stacked: " + intervalNotesPlayed);
@@ -172,6 +173,8 @@ void keyPressed() {
       
       String note = numToNoteMap.get(num);
       squares[num].play(map.get(note), .4);
+      
+      intervalNotesPlayed += 1;
       
       wave.p1PlayNote(note);
     }

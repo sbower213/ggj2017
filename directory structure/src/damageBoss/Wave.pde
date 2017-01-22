@@ -175,12 +175,12 @@ class Wave {
   }
   
   void p1PlayNote(String note) {
-      p1EventTimes.add(millis());
+      p1EventTimes.add((int)(((int)(millis() / millisPerBeat) + 1) * millisPerBeat));
       p1EventNotes.add(note);
   }
   
   void p2PlayNote(String note) {
-      p2EventTimes.add(millis());
+      p2EventTimes.add((int)(((int)(millis() / millisPerBeat) + 1) * millisPerBeat));
       p2EventNotes.add(note);
   }
 }
