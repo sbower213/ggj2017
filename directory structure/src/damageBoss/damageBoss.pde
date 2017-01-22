@@ -27,7 +27,7 @@ float delta;
 Wave playerWave;
 Boss boss;
 Wave bossWave1, bossWave2;
-FilePlayer filePlayer1, filePlayer2,backgroundPlayer;
+FilePlayer filePlayer1, filePlayer2, bassPlayer, backgroundPlayer;
 
 int turn;
 int barsPerTurn = 4;
@@ -57,8 +57,8 @@ float uiScale;
 float widthScale;
 
 void setup() {
-  fullScreen();
-//  size(800, 360);
+//  fullScreen();
+  size(800, 360);
   background(255);
   
   uiScale = height / 360;
@@ -146,7 +146,21 @@ void setup() {
   p2ButtonToNumMap.put(":", 5); //y
   
   lastMillis = millis();
+  
   // Background player code
+  SqrOsc[] bassSquares = new SqrOsc[6];
+  for (int i = 0; i < squares.length; i++) {
+    bassSquares[i] = new SqrOsc(this);
+  }
+  
+  SinOsc[] bassSines = new SinOsc[6];
+  for (int i = 0; i <  sines.length; i++) {
+    bassSines[i] = new SinOsc(this);
+  }
+  bassPlayer = new FilePlayer(.2, 4 * millisPerBeat * 8, -1);
+  bassPlayer.setSong("song2_reformatted.txt",bassSquares,bassSines);
+  
+  
   SqrOsc[] backSquares = new SqrOsc[6];
   for (int i = 0; i < squares.length; i++) {
     backSquares[i] = new SqrOsc(this);
@@ -156,8 +170,8 @@ void setup() {
   for (int i = 0; i <  sines.length; i++) {
     backSines[i] = new SinOsc(this);
   }
-  backgroundPlayer = new FilePlayer();
-  backgroundPlayer.setSong("song2_reformatted.txt",backSquares,backSines);
+  backgroundPlayer = new FilePlayer(.2, 4 * millisPerBeat * 8, 0);
+  backgroundPlayer.setSong("song_reformatted.txt",backSquares,backSines);
 }
 
 void startGame() {
@@ -187,11 +201,13 @@ void startGame() {
   
   p1CurrPlaying = new boolean[6];
   p2CurrPlaying = new boolean[6];
+  
+  backgroundPlayer.reset();
+  bassPlayer.reset();
 }
 
 void draw() {
   background(0);
-  backgroundPlayer.playSong(null);
   delta = (millis() - lastMillis) / 1000.0;
   lastMillis = millis();
     
@@ -225,6 +241,8 @@ void draw() {
       nextClick++;
       nextClick %= 4;
     }
+    backgroundPlayer.playSong(null);
+    bassPlayer.playSong(null);
     
     if (turn % 2 == 0) {
       if (turn == 2) {

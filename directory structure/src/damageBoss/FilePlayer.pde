@@ -8,7 +8,21 @@ class FilePlayer {
   SinOsc[] sines;
   boolean[] currPlaying;
   int resetTime;
+  float volume;
+  int loopTime;
+  int octave;
   
+  public FilePlayer() {
+    volume = .4;
+    loopTime = 0;
+    octave = 0;
+  }
+  
+  public FilePlayer(float v, int lt, int oc) {
+    volume = v;
+    loopTime = lt;
+    octave = oc;
+  }
   
   void setSong(String filename,SqrOsc[] setSquares, SinOsc[] setSines) {
     int loadMPB = 300;
@@ -38,12 +52,17 @@ class FilePlayer {
   void reset() {
     resetTime = millis();
     eventIndex = 0;
+    
+    for (int i = 0; i < squares.length; i++) {
+      squares[i].stop();
+      sines[i].stop();
+    }
   }
   
   void playSong(Wave wave){
     while(eventIndex < eventTimes.length && millis() - resetTime >= eventTimes[eventIndex]){
       String noteName = eventNotes[eventIndex];
-      float noteFreq = map.get(noteName);
+      float noteFreq = map.get(noteName) * pow(2, octave);
       
       if(noteName.equals("e")){
         if(currPlaying[0]){
@@ -57,7 +76,7 @@ class FilePlayer {
         } else {
           currPlaying[0] = true;
           //numPlaying += 1;
-          squares[0].play(noteFreq, .4);
+          squares[0].play(noteFreq, volume);
           //timesPressed[0] = millis();
           if(wave != null) {
             wave.p1PlayNote("e");
@@ -79,7 +98,7 @@ class FilePlayer {
           println("started fs");
           currPlaying[1] = true;
           //numPlaying += 1;
-          squares[1].play(noteFreq, .4);
+          squares[1].play(noteFreq, volume);
           //timesPressed[1] = millis();
           if(wave != null) {
             wave.p1PlayNote("fs");
@@ -99,7 +118,7 @@ class FilePlayer {
         } else {
           currPlaying[2] = true;
           //numPlaying += 1;
-          squares[2].play(noteFreq, .4);
+          squares[2].play(noteFreq, volume);
           //timesPressed[2] = millis();
           if(wave != null) {
             wave.p1PlayNote("gs");
@@ -122,7 +141,7 @@ class FilePlayer {
           currPlaying[3] = true;
           //numPlaying += 1;
           
-          squares[3].play(noteFreq, .4);
+          squares[3].play(noteFreq, volume);
           //timesPressed[3] = millis();
           if(wave != null) {
             wave.p1PlayNote("a");
@@ -143,7 +162,7 @@ class FilePlayer {
           currPlaying[4] = true;
           //numPlaying += 1;
           println(squares[4]);
-          squares[4].play(noteFreq, .4);
+          squares[4].play(noteFreq, volume);
           //timesPressed[4] = millis();
           if(wave != null) {
             wave.p1PlayNote("b");
@@ -163,7 +182,7 @@ class FilePlayer {
         } else {
           currPlaying[5] = true;
           //numPlaying += 1;
-          squares[5].play(noteFreq, .4);
+          squares[5].play(noteFreq, volume);
           //timesPressed[5] = millis();
           if(wave != null) {
             wave.p1PlayNote("cs");
@@ -174,9 +193,10 @@ class FilePlayer {
       }
       
       eventIndex++;
-      if(wave == null && eventIndex >= eventTimes.length) {
-        reset();
-      }
+    }
+    //println("lt: " + loopTime);
+    if(loopTime > 0 && millis() - resetTime > loopTime) {
+      reset();
     }
   }
 }
