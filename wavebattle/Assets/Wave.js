@@ -1,5 +1,8 @@
 ﻿#pragma strict
 
+using System.Text;
+using System.IO;
+
 var yvalues;
 var xspacing = 2;
 
@@ -10,3 +13,4 @@ function Start () {
 function Update () {
 	
 }
+
