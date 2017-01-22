@@ -52,7 +52,7 @@ boolean p2Active;
 
 boolean over = false;
 boolean lost = false;
-boolean tutPhases = [false,false,false];
+boolean[] tutPhases = {false,false,false};
 
 float uiScale;
 float widthScale;
@@ -63,8 +63,8 @@ boolean delay;
 int delayStart;
 
 void setup() {
-  //  fullScreen();
-  size(800, 360);
+    fullScreen();
+  //size(800, 360);
   background(255);
 
   uiScale = height / 360;
@@ -218,7 +218,7 @@ void startGame() {
   
   boss.x = width / 2;
   boss.y = height / 3;
-  boss.r = 100;
+  boss.r = 100 * uiScale;
 }
 
 void draw() {
@@ -292,7 +292,7 @@ void draw() {
         int countdown = 8 - (millis() - delayStart)/millisPerBeat;
 
         fill(255, 255, 255, 255);
-        text(countdown, 400, 250);
+        text(countdown, width/2, height/4);
       }
       
       println(millis() - turnStart);
@@ -379,7 +379,6 @@ void draw() {
       scale(-1, 1);
       bossWave1.drawWave();
       bossWave1.drawOpponent();
-      translate(width, 0);
       scale(-1, 1);
       
       bossWave2.drawWave();
