@@ -66,8 +66,8 @@ boolean delay;
 int delayStart;
 
 void setup() {
-  //fullScreen();
-  size(800, 360);
+  fullScreen();
+  //size(800, 360);
   background(255);
 
   uiScale = height / 360;
