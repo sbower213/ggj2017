@@ -172,10 +172,6 @@ class Wave {
     line(x, height/2 - oppHeight, x, height/2 + p1Height);
     stroke(255);
     ellipse(x, height / 2  - oppHeight, 16, 16);
-    
-    if (!matched(t - travelTime)) {
-      health -= max(abs(oppHeight - p1Height) / 20 - 2, 0);
-    }
   }
   
   void p1PlayNote(String note) {
