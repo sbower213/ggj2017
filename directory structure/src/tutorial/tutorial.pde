@@ -521,6 +521,12 @@ void mousePressed() {
      else if(learning && tutPhases[1] && mouseX <= 700 * widthScale && mouseX >= 600 * widthScale
      && mouseY >= 150 * uiScale && uiScale <= 200 * uiScale) {
        tutPhases[1] = false;
+       tutPhases[2] = true;
+       //learning = false;
+     }
+     else if(learning && tutPhases[2] && mouseX <= 700 * widthScale && mouseX >= 600 * widthScale
+     && mouseY >= 150 * uiScale && uiScale <= 200 * uiScale) {
+       tutPhases[2] = false;
        learning = false;
      }
 }
@@ -646,6 +652,19 @@ void drawTutorial(){
     text(";", 770 * widthScale, 330 * uiScale);
     rect(600 * widthScale, 150 * uiScale, 100 * widthScale, 50 * uiScale);
     fill(255,255,255,255);
+    text("NEXT",650 * widthScale, 180 * uiScale);
+  } else if(tutPhases[2]) {
+    fill(255,0,0);
+    int drawHealth = 1000;
+    rect(0, 0, drawHealth / 1000.0 * width, uiScale * 20);
+    drawHealth = 500;
+    text("^ YOUR COMBINED HEALTH BAR IS ON TOP ^",400 * widthScale, 100 * uiScale);
+    fill(0,0,255);
+    rect(0, uiScale * 20, drawHealth / 500.0 * width,uiScale * 20);
+    text("^ THE BOSS HEALTH BAR IS ON THE BOTTOM ^", 400 * widthScale, 150 * uiScale);
+    //drawHealth = 0;
+    fill(255,255,255,255);
     text("FINISH",650 * widthScale, 180 * uiScale);
+    
   }
 }
