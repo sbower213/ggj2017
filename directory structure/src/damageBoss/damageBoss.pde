@@ -501,21 +501,21 @@ void damagePlayer() {
   float p1Height = bossWave1.p1Height(t - bossWave1.travelTime);
 
   if (!bossWave1.matched(t - bossWave1.travelTime)) {
-    health -= max(abs(opp1Height - p1Height) / 20 - 2, 0);
+    health -= max(abs(opp1Height - p1Height) / 20 - 2, 0) * 1.5;
   }
 
   float opp2Height = bossWave2.p2Height(t);
   float p2Height = bossWave2.p1Height(t - bossWave2.travelTime);
 
   if (!bossWave2.matched(t - bossWave2.travelTime)) {
-    health -= max(abs(opp2Height - p2Height) / 20 - 2, 0);
+    health -= max(abs(opp2Height - p2Height) / 20 - 2, 0) * 1.5;
   }
 }
 
 void damageBoss() {
   /*println("counter: " + damageCounter);
    println("modifier: " + (intervalNotesPlayed + 1));*/
-  float damageToBoss = damageCounter * (intervalNotesPlayed + 1);
+  float damageToBoss = damageCounter * (intervalNotesPlayed + 1) * .6;
   boss.damage(damageToBoss);
   intervalNotesPlayed = 0;
   damageCounter = 0;
