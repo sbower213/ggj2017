@@ -66,8 +66,8 @@ boolean delay;
 int delayStart;
 
 void setup() {
-  fullScreen();
-  //size(800, 360);
+  //fullScreen();
+  size(800, 360);
   background(255);
 
   uiScale = height / 360;
@@ -314,7 +314,6 @@ void draw() {
         }
         
         delay1Over = true;
-        println("delay 1 over");
       }
       
       if (delay2Over) {
@@ -376,9 +375,16 @@ void draw() {
         //delayStart = millis();
         delay2Over = true;
         delayStart = millis();
-        println("delay 2 start");
         
-        damageToBoss = damageCounter * (intervalNotesPlayed + 1) * .6;
+        
+        
+        damageToBoss = damageCounter * (4 / (1 + pow(2, -(intervalNotesPlayed - 4))));
+        
+        println("damageCounter: " + damageCounter);
+        
+        println("notes: " + intervalNotesPlayed);
+        println("multiplier: " + (1 / (1 + pow(2, -(intervalNotesPlayed - 4)))));
+        println("total damage: " + damageToBoss);
         
         damageBoss();
       }
@@ -491,6 +497,8 @@ void draw() {
         p1Active = false;
         p2Active = false;
         runningPlayerDamage = 0;
+        intervalNotesPlayed = 0;
+        damageCounter = 0;
       }
     }
 
@@ -617,7 +625,7 @@ void keyPressed() {
       p1CurrPlaying[num] = true;
 
       String note = numToNoteMap.get(num);
-      squares[num].play(map.get(note), .2);
+      squares[num].play(map.get(note), .4);
 
       intervalNotesPlayed += 1;
 
@@ -637,7 +645,7 @@ void keyPressed() {
       p2CurrPlaying[num] = true;
 
       String note = numToNoteMap.get(num);
-      sines[num].play(map.get(note), 1);
+      sines[num].play(map.get(note), .4);
 
       if (turn == 2)
         playerWave.p1PlayNote(note);
